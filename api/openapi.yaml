@@ -1,0 +1,1820 @@
+# DRAFT v0.1 - needs agreement with the frontend and UI teammates. Generated once, now edited by hand.
+openapi: 3.1.0
+info:
+  title: NOOK API
+  version: 0.1.0-draft
+  summary: DRAFT v0.1 - needs agreement with the frontend and UI teammates before it is treated as final
+  description: '**DRAFT v0.1 - needs agreement with the frontend and UI teammates before it is treated
+    as final.**
+
+
+    Derived from docs/endpoints.md. Operations marked `x-status: tbd` have open decisions (login method,
+    course flow, marketing links, coupon scope) and their shapes are placeholders. No endpoint is implemented
+    yet.
+
+
+    Pagination (`limit`, `cursor`, `next_cursor`) is a draft convention that needs frontend agreement.
+
+
+    Option lists for industry, main customers, quiet hours and mood tags are PROVISIONAL (UI teammate
+    decides). All example shops are fictional.'
+servers:
+- url: http://127.0.0.1:8000
+  description: Local development
+tags:
+- name: auth
+  description: Sign-up and login (method undecided)
+- name: business-profile
+  description: F1 shop profile
+- name: recommendations
+  description: F2 AI recommendations
+- name: collab-requests
+  description: F3 collaboration requests
+- name: posts
+  description: F4 recruitment posts / love calls
+- name: ideas
+  description: F6 AI collaboration ideas
+- name: courses
+  description: F8 collaboration courses (owner side, tbd)
+- name: public
+  description: Public pages, no login
+- name: tbd
+  description: 'F5 marketing links and F7 coupons/measurements: scope undecided'
+paths:
+  /v1/auth/signup:
+    post:
+      tags:
+      - auth
+      summary: Create a shop owner account
+      operationId: post_v1_auth_signup
+      x-status: tbd
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignupRequest'
+            example:
+              email: owner@example.test
+              password: example-password
+      responses:
+        '201':
+          description: Success.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/TokenPair'
+              example:
+                data:
+                  access_token: <token>
+                  refresh_token: <token>
+                  token_type: bearer
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+      security: []
+      description: Open decision, see docs/endpoints.md; shape is a placeholder.
+  /v1/auth/login:
+    post:
+      tags:
+      - auth
+      summary: Log in and receive tokens
+      operationId: post_v1_auth_login
+      x-status: tbd
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+            example:
+              email: owner@example.test
+              password: example-password
+      responses:
+        '200':
+          description: Success.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/TokenPair'
+              example:
+                data:
+                  access_token: <token>
+                  refresh_token: <token>
+                  token_type: bearer
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+      security: []
+      description: Open decision, see docs/endpoints.md; shape is a placeholder.
+  /v1/auth/refresh:
+    post:
+      tags:
+      - auth
+      summary: Refresh the access token
+      operationId: post_v1_auth_refresh
+      x-status: tbd
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshRequest'
+            example:
+              refresh_token: <token>
+      responses:
+        '200':
+          description: Success.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/TokenPair'
+              example:
+                data:
+                  access_token: <token>
+                  refresh_token: <token>
+                  token_type: bearer
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+      security:
+      - bearerAuth: []
+      description: Open decision, see docs/endpoints.md; shape is a placeholder.
+  /v1/me/business/verification:
+    post:
+      tags:
+      - business-profile
+      summary: Verify the business registration number
+      operationId: post_v1_me_business_verification
+      x-status: tbd
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerificationRequest'
+            example:
+              registration_number: 000-00-00000
+      responses:
+        '202':
+          description: Success.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Verification'
+              example:
+                data:
+                  status: PENDING
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+      security:
+      - bearerAuth: []
+      description: Open decision, see docs/endpoints.md; shape is a placeholder.
+  /v1/me/business:
+    get:
+      tags:
+      - business-profile
+      summary: Read own shop profile
+      operationId: get_v1_me_business
+      x-status: draft
+      responses:
+        '200':
+          description: Success.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/BusinessProfile'
+              example:
+                data: &id001
+                  neighborhood_id: nbh_001
+                  industry: cafe
+                  main_customers: &id002
+                  - students
+                  quiet_hours: &id003
+                  - weekday_afternoon
+                  mood_tags: &id004
+                  - quiet
+                  - cozy
+                  intro: 조용히 공부하기 좋은 골목 안쪽 작은 다방
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - bearerAuth: []
+    put:
+      tags:
+      - business-profile
+      summary: Save own shop profile
+      operationId: put_v1_me_business
+      x-status: draft
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BusinessProfile'
+            example: *id001
+      responses:
+        '200':
+          description: Success.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/BusinessProfile'
+              example:
+                data: *id001
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+      security:
+      - bearerAuth: []
+  /v1/me/business/photos:
+    post:
+      tags:
+      - business-profile
+      summary: Get presigned upload URLs for shop photos (1-3)
+      operationId: post_v1_me_business_photos
+      x-status: draft
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PhotoUploadRequest'
+            example:
+              count: 2
+              content_type: image/jpeg
+      responses:
+        '200':
+          description: Success.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/PhotoUploadResponse'
+              example:
+                data:
+                  uploads:
+                  - upload_url: https://storage.example.test/upload/abc
+                    photo_id: photo_001
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+      security:
+      - bearerAuth: []
+  /v1/me/business/intro-draft:
+    post:
+      tags:
+      - business-profile
+      summary: AI-generated one-line intro draft for the owner to edit
+      operationId: post_v1_me_business_intro_draft
+      x-status: draft
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IntroDraftRequest'
+            example: *id001
+      responses:
+        '200':
+          description: Success.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/IntroDraft'
+              example:
+                data:
+                  intro: 조용히 공부하기 좋은 골목 안쪽 작은 다방
+                  ai_generated: true
+                  disclosure: This content was generated by AI.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+      security:
+      - bearerAuth: []
+      description: Response includes AI disclosure fields (`ai_generated`, `disclosure`); the client must
+        show the disclosure.
+  /v1/me/consents:
+    post:
+      tags:
+      - business-profile
+      summary: Record consents
+      operationId: post_v1_me_consents
+      x-status: draft
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConsentRequest'
+            example:
+              consents:
+              - type: TERMS
+                accepted: true
+      responses:
+        '204':
+          description: Success, no body.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+      security:
+      - bearerAuth: []
+  /v1/recommendations:
+    get:
+      tags:
+      - recommendations
+      summary: AI-recommended collaboration candidates
+      operationId: get_v1_recommendations
+      x-status: draft
+      parameters:
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Cursor'
+      responses:
+        '200':
+          description: Success.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                - next_cursor
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Recommendation'
+                  next_cursor:
+                    type:
+                    - string
+                    - 'null'
+                    description: Pass as `cursor` for the next page; null on the last page. DRAFT convention.
+              example:
+                data:
+                - business:
+                    id: biz_003
+                    name: 밀밭제빵소
+                    neighborhood_id: nbh_001
+                    industry: cafe
+                    main_customers: *id002
+                    quiet_hours: *id003
+                    mood_tags: *id004
+                    intro: 조용히 공부하기 좋은 골목 안쪽 작은 다방
+                  reason: Quiet afternoon hours overlap and the customer groups complement each other.
+                  ai_generated: true
+                  disclosure: This content was generated by AI.
+                next_cursor: null
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      security:
+      - bearerAuth: []
+      description: Response includes AI disclosure fields (`ai_generated`, `disclosure`); the client must
+        show the disclosure.
+  /v1/recommendations/preferences:
+    post:
+      tags:
+      - recommendations
+      summary: Answer the AI's first-time question about the preferred partner
+      operationId: post_v1_recommendations_preferences
+      x-status: draft
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecommendationPreferences'
+            example:
+              preferred_industries:
+              - bakery
+              preferred_mood_tags:
+              - cozy
+      responses:
+        '204':
+          description: Success, no body.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+      security:
+      - bearerAuth: []
+  /v1/collab-requests:
+    post:
+      tags:
+      - collab-requests
+      summary: Send a collaboration request
+      operationId: post_v1_collab_requests
+      x-status: tbd
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CollabRequestCreate'
+            example:
+              recipient_business_id: biz_003
+              source: RECOMMENDATION
+              post_id: null
+      responses:
+        '201':
+          description: Success.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/CollabRequest'
+              example:
+                data: &id005
+                  id: req_001
+                  sender_business_id: biz_001
+                  recipient_business_id: biz_003
+                  source: RECOMMENDATION
+                  status: PENDING
+                  post_id: null
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+      security:
+      - bearerAuth: []
+      description: Open decision, see docs/endpoints.md; shape is a placeholder.
+    get:
+      tags:
+      - collab-requests
+      summary: List sent or received requests
+      operationId: get_v1_collab_requests
+      x-status: draft
+      parameters:
+      - name: box
+        in: query
+        required: true
+        schema:
+          type: string
+          enum:
+          - sent
+          - received
+        description: Which box to list.
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Cursor'
+      responses:
+        '200':
+          description: Success.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                - next_cursor
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CollabRequest'
+                  next_cursor:
+                    type:
+                    - string
+                    - 'null'
+                    description: Pass as `cursor` for the next page; null on the last page. DRAFT convention.
+              example:
+                data:
+                - *id005
+                next_cursor: null
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+      security:
+      - bearerAuth: []
+  /v1/collab-requests/{id}/accept:
+    post:
+      tags:
+      - collab-requests
+      summary: Recipient accepts a request
+      operationId: post_v1_collab_requests_id_accept
+      x-status: tbd
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: Collaboration request id
+        schema:
+          type: string
+        example: req_001
+      responses:
+        '200':
+          description: Success.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/CollabRequest'
+              example:
+                data:
+                  id: req_001
+                  sender_business_id: biz_001
+                  recipient_business_id: biz_003
+                  source: RECOMMENDATION
+                  status: ACCEPTED
+                  post_id: null
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/InvalidState'
+      security:
+      - bearerAuth: []
+      description: Open decision, see docs/endpoints.md; shape is a placeholder.
+  /v1/collab-requests/{id}/reject:
+    post:
+      tags:
+      - collab-requests
+      summary: Recipient rejects a request
+      operationId: post_v1_collab_requests_id_reject
+      x-status: draft
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: Collaboration request id
+        schema:
+          type: string
+        example: req_001
+      responses:
+        '200':
+          description: Success.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/CollabRequest'
+              example:
+                data:
+                  id: req_001
+                  sender_business_id: biz_001
+                  recipient_business_id: biz_003
+                  source: RECOMMENDATION
+                  status: REJECTED
+                  post_id: null
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/InvalidState'
+      security:
+      - bearerAuth: []
+  /v1/posts/{id}/love-call:
+    post:
+      tags:
+      - collab-requests
+      summary: Respond to a love call (creates a request with source LOVE_CALL)
+      operationId: post_v1_posts_id_love_call
+      x-status: draft
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: Post id
+        schema:
+          type: string
+        example: post_001
+      responses:
+        '201':
+          description: Success.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/CollabRequest'
+              example:
+                data:
+                  id: req_001
+                  sender_business_id: biz_001
+                  recipient_business_id: biz_003
+                  source: LOVE_CALL
+                  status: PENDING
+                  post_id: post_001
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/InvalidState'
+      security:
+      - bearerAuth: []
+  /v1/posts:
+    get:
+      tags:
+      - posts
+      summary: List collaboration recruitment posts / love calls
+      operationId: get_v1_posts
+      x-status: draft
+      parameters:
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Cursor'
+      responses:
+        '200':
+          description: Success.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                - next_cursor
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Post'
+                  next_cursor:
+                    type:
+                    - string
+                    - 'null'
+                    description: Pass as `cursor` for the next page; null on the last page. DRAFT convention.
+              example:
+                data:
+                - &id006
+                  id: post_001
+                  business_id: biz_003
+                  title: Looking for a cafe partner for a morning bread-and-coffee set
+                  body: We bake fresh bread every morning and want a nearby cafe to pair it with.
+                  created_at: '2026-10-01T09:00:00Z'
+                next_cursor: null
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      security:
+      - bearerAuth: []
+    post:
+      tags:
+      - posts
+      summary: Create a recruitment post / love call
+      operationId: post_v1_posts
+      x-status: draft
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostCreate'
+            example:
+              title: Looking for a cafe partner for a morning bread-and-coffee set
+              body: We bake fresh bread every morning and want a nearby cafe to pair it with.
+      responses:
+        '201':
+          description: Success.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Post'
+              example:
+                data: *id006
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+      security:
+      - bearerAuth: []
+  /v1/me/marketing-links:
+    post:
+      tags:
+      - tbd
+      summary: Link marketing data (AI input only, never shown to other owners)
+      operationId: post_v1_me_marketing_links
+      x-status: tbd
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MarketingLinkCreate'
+            example:
+              kind: INSTAGRAM
+              url: https://instagram.example.test/moonlight_dabang
+      responses:
+        '201':
+          description: Success.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/MarketingLink'
+              example:
+                data:
+                  id: mkl_001
+                  kind: INSTAGRAM
+                  url: https://instagram.example.test/moonlight_dabang
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+      security:
+      - bearerAuth: []
+      description: Open decision, see docs/endpoints.md; shape is a placeholder.
+  /v1/me/marketing-links/{id}:
+    delete:
+      tags:
+      - tbd
+      summary: Unlink marketing data
+      operationId: delete_v1_me_marketing_links_id
+      x-status: tbd
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: Marketing link id
+        schema:
+          type: string
+        example: mkl_001
+      responses:
+        '204':
+          description: Success, no body.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - bearerAuth: []
+      description: Open decision, see docs/endpoints.md; shape is a placeholder.
+  /v1/collab-requests/{id}/ideas:
+    post:
+      tags:
+      - ideas
+      summary: AI collaboration ideas and promotional content
+      operationId: post_v1_collab_requests_id_ideas
+      x-status: draft
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: Collaboration request id
+        schema:
+          type: string
+        example: req_001
+      responses:
+        '200':
+          description: Success.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Ideas'
+              example:
+                data:
+                  ideas:
+                  - title: Morning bread-and-coffee set
+                    description: Pair a loaf with a drink at a bundled price.
+                  promo_text: Fresh bread meets slow coffee, two doors apart.
+                  ai_generated: true
+                  disclosure: This content was generated by AI.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - bearerAuth: []
+      description: Response includes AI disclosure fields (`ai_generated`, `disclosure`); the client must
+        show the disclosure.
+  /v1/public/coupons/{code}/scan:
+    post:
+      tags:
+      - tbd
+      summary: Record a coupon/QR scan or redemption
+      operationId: post_v1_public_coupons_code_scan
+      x-status: tbd
+      parameters:
+      - name: code
+        in: path
+        required: true
+        description: Coupon code
+        schema:
+          type: string
+        example: MOON-0001
+      responses:
+        '200':
+          description: Success.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/CouponScanResult'
+              example:
+                data:
+                  recorded: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security: []
+      description: Open decision, see docs/endpoints.md; shape is a placeholder.
+  /v1/me/measurements:
+    get:
+      tags:
+      - tbd
+      summary: Coupon/QR effect results
+      operationId: get_v1_me_measurements
+      x-status: tbd
+      parameters:
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Cursor'
+      responses:
+        '200':
+          description: Success.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                - next_cursor
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Measurement'
+                  next_cursor:
+                    type:
+                    - string
+                    - 'null'
+                    description: Pass as `cursor` for the next page; null on the last page. DRAFT convention.
+              example:
+                data:
+                - coupon_code: MOON-0001
+                  scans: 12
+                  redemptions: 4
+                next_cursor: null
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      security:
+      - bearerAuth: []
+      description: Open decision, see docs/endpoints.md; shape is a placeholder.
+  /v1/courses:
+    post:
+      tags:
+      - courses
+      summary: Create a collaboration course
+      operationId: post_v1_courses
+      x-status: tbd
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CourseCreate'
+            example:
+              neighborhood_id: nbh_001
+              business_ids:
+              - biz_001
+              - biz_003
+      responses:
+        '201':
+          description: Success.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Course'
+              example:
+                data:
+                  id: crs_001
+                  slug: moonlight-alley-walk
+                  neighborhood_id: nbh_001
+                  title: Moonlight Alley slow afternoon
+                  stops: &id007
+                  - order: 1
+                    business_id: biz_001
+                    benefit: Free cookie with any drink
+                  - order: 2
+                    business_id: biz_003
+                    benefit: 10% off bread
+                  status: DRAFT
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+      security:
+      - bearerAuth: []
+      description: Open decision, see docs/endpoints.md; shape is a placeholder.
+  /v1/courses/{id}/confirm:
+    post:
+      tags:
+      - courses
+      summary: Owner confirms the course
+      operationId: post_v1_courses_id_confirm
+      x-status: tbd
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: Course id
+        schema:
+          type: string
+        example: crs_001
+      responses:
+        '200':
+          description: Success.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Course'
+              example:
+                data:
+                  id: crs_001
+                  slug: moonlight-alley-walk
+                  neighborhood_id: nbh_001
+                  title: Moonlight Alley slow afternoon
+                  stops: *id007
+                  status: CONFIRMED
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/InvalidState'
+      security:
+      - bearerAuth: []
+      description: Open decision, see docs/endpoints.md; shape is a placeholder.
+  /v1/courses/{id}/publish:
+    post:
+      tags:
+      - courses
+      summary: Publish the course to the public page
+      operationId: post_v1_courses_id_publish
+      x-status: tbd
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: Course id
+        schema:
+          type: string
+        example: crs_001
+      responses:
+        '200':
+          description: Success.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Course'
+              example:
+                data:
+                  id: crs_001
+                  slug: moonlight-alley-walk
+                  neighborhood_id: nbh_001
+                  title: Moonlight Alley slow afternoon
+                  stops: *id007
+                  status: PUBLISHED
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/InvalidState'
+      security:
+      - bearerAuth: []
+      description: Open decision, see docs/endpoints.md; shape is a placeholder.
+  /v1/public/neighborhoods:
+    get:
+      tags:
+      - public
+      summary: Neighborhood list (customer picks manually, no GPS)
+      operationId: get_v1_public_neighborhoods
+      x-status: draft
+      parameters:
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Cursor'
+      responses:
+        '200':
+          description: Success.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                - next_cursor
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Neighborhood'
+                  next_cursor:
+                    type:
+                    - string
+                    - 'null'
+                    description: Pass as `cursor` for the next page; null on the last page. DRAFT convention.
+              example:
+                data:
+                - id: nbh_001
+                  name: 달빛골목
+                - id: nbh_002
+                  name: 솔향마을
+                next_cursor: null
+      security: []
+  /v1/public/neighborhoods/{id}/courses:
+    get:
+      tags:
+      - public
+      summary: Neighborhood overview and its collaboration courses
+      operationId: get_v1_public_neighborhoods_id_courses
+      x-status: draft
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: Neighborhood id
+        schema:
+          type: string
+        example: nbh_001
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Cursor'
+      responses:
+        '200':
+          description: Success.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                - next_cursor
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Course'
+                  next_cursor:
+                    type:
+                    - string
+                    - 'null'
+                    description: Pass as `cursor` for the next page; null on the last page. DRAFT convention.
+              example:
+                data:
+                - id: crs_001
+                  slug: moonlight-alley-walk
+                  neighborhood_id: nbh_001
+                  title: Moonlight Alley slow afternoon
+                  stops: *id007
+                  status: PUBLISHED
+                next_cursor: null
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security: []
+  /v1/public/courses/{slug}:
+    get:
+      tags:
+      - public
+      summary: 'Course detail: ordered shops and benefits'
+      operationId: get_v1_public_courses_slug
+      x-status: draft
+      parameters:
+      - name: slug
+        in: path
+        required: true
+        description: Course slug
+        schema:
+          type: string
+        example: moonlight-alley-walk
+      responses:
+        '200':
+          description: Success.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Course'
+              example:
+                data:
+                  id: crs_001
+                  slug: moonlight-alley-walk
+                  neighborhood_id: nbh_001
+                  title: Moonlight Alley slow afternoon
+                  stops: *id007
+                  status: PUBLISHED
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security: []
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: login method undecided (app vs web), see docs/auth-options.md
+  parameters:
+    Limit:
+      name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+      description: Page size. DRAFT convention.
+    Cursor:
+      name: cursor
+      in: query
+      required: false
+      schema:
+        type: string
+      description: Opaque cursor from a previous `next_cursor`. DRAFT convention.
+  responses:
+    Unauthorized:
+      description: Not logged in, or token missing/expired.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error:
+              code: AUTH_REQUIRED
+              message: Authentication required.
+              details: []
+    NotFound:
+      description: Resource does not exist.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error:
+              code: NOT_FOUND
+              message: Not found.
+              details: []
+    InvalidState:
+      description: Action not allowed in the resource's current state.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error:
+              code: REQUEST_INVALID_STATE
+              message: Request is not in a state that allows this action.
+              details: []
+    ValidationFailed:
+      description: Request body/params invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error:
+              code: REQUEST_VALIDATION_FAILED
+              message: Request validation failed.
+              details:
+              - field: body.intro
+                message: String should have at most 60 characters
+                type: string_too_long
+  schemas:
+    ErrorResponse:
+      type: object
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - code
+          - message
+          - details
+          properties:
+            code:
+              type: string
+              enum:
+              - AUTH_REQUIRED
+              - AUTH_FORBIDDEN
+              - NOT_FOUND
+              - REQUEST_INVALID_STATE
+              - REQUEST_VALIDATION_FAILED
+              - INTERNAL_ERROR
+              - HTTP_ERROR
+            message:
+              type: string
+            details:
+              type: array
+              items:
+                type: object
+                properties:
+                  field:
+                    type: string
+                  message:
+                    type: string
+                  type:
+                    type: string
+              description: Field errors for REQUEST_VALIDATION_FAILED; otherwise empty.
+    DataResponse:
+      type: object
+      required:
+      - data
+      properties:
+        data: {}
+      description: Generic success wrapper; each operation narrows `data`.
+    AIGeneratedMeta:
+      type: object
+      required:
+      - ai_generated
+      - disclosure
+      properties:
+        ai_generated:
+          type: boolean
+          default: true
+        disclosure:
+          type: string
+          description: Placeholder wording, final text to be decided.
+          example: This content was generated by AI.
+    CollabRequest:
+      type: object
+      required:
+      - id
+      - sender_business_id
+      - recipient_business_id
+      - source
+      - status
+      properties:
+        id:
+          type: string
+        sender_business_id:
+          type: string
+        recipient_business_id:
+          type: string
+        source:
+          type: string
+          enum:
+          - RECOMMENDATION
+          - LOVE_CALL
+          - PROFILE
+        status:
+          type: string
+          enum:
+          - PENDING
+          - ACCEPTED
+          - REJECTED
+        post_id:
+          type:
+          - string
+          - 'null'
+          description: Set when source is LOVE_CALL.
+    CollabRequestCreate:
+      type: object
+      required:
+      - recipient_business_id
+      - source
+      properties:
+        recipient_business_id:
+          type: string
+        source:
+          type: string
+          enum:
+          - RECOMMENDATION
+          - LOVE_CALL
+          - PROFILE
+        post_id:
+          type:
+          - string
+          - 'null'
+    BusinessProfile:
+      type: object
+      required:
+      - industry
+      - main_customers
+      - quiet_hours
+      - mood_tags
+      - intro
+      - neighborhood_id
+      description: Option lists are PROVISIONAL (see data/samples/); the UI teammate decides the final
+        lists.
+      x-provisional: true
+      properties:
+        industry:
+          type: string
+          enum: &id008
+          - cafe
+          - bakery
+          - restaurant
+          - bookstore
+          - flower_shop
+          - gallery
+          - fitness_studio
+          - pottery_workshop
+          - vintage_shop
+          - bar
+          description: PROVISIONAL option list copied from data/samples/; the UI teammate decides the
+            final list.
+        main_customers:
+          type: array
+          minItems: 1
+          maxItems: 2
+          uniqueItems: true
+          items:
+            type: string
+            enum:
+            - students
+            - office_workers
+            - families
+            - tourists
+            - seniors
+            - couples
+          description: PROVISIONAL option list copied from data/samples/; the UI teammate decides the
+            final list.
+        quiet_hours:
+          type: array
+          minItems: 1
+          maxItems: 2
+          uniqueItems: true
+          items:
+            type: string
+            enum:
+            - weekday_morning
+            - weekday_afternoon
+            - weekday_evening
+            - weekend_morning
+            - weekend_afternoon
+            - weekend_evening
+          description: PROVISIONAL option list copied from data/samples/; the UI teammate decides the
+            final list.
+        mood_tags:
+          type: array
+          minItems: 1
+          maxItems: 3
+          uniqueItems: true
+          items:
+            type: string
+            enum: &id009
+            - quiet
+            - emotional
+            - lively
+            - cozy
+            - trendy
+            - vintage
+            - minimal
+            - family_friendly
+          description: PROVISIONAL option list copied from data/samples/; the UI teammate decides the
+            final list.
+        intro:
+          type: string
+          minLength: 1
+          maxLength: 60
+        neighborhood_id:
+          type: string
+          pattern: ^nbh_[0-9]{3}$
+        instagram_url:
+          type:
+          - string
+          - 'null'
+          format: uri
+          description: Optional; see endpoints.md F1.
+    SignupRequest:
+      type: object
+      required:
+      - email
+      - password
+      x-status: tbd
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 8
+    LoginRequest:
+      type: object
+      required:
+      - email
+      - password
+      x-status: tbd
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+    RefreshRequest:
+      type: object
+      required:
+      - refresh_token
+      x-status: tbd
+      properties:
+        refresh_token:
+          type: string
+    TokenPair:
+      type: object
+      x-status: tbd
+      description: 'Placeholder: login method undecided (app vs web), see docs/auth-options.md.'
+      required:
+      - access_token
+      - token_type
+      properties:
+        access_token:
+          type: string
+        refresh_token:
+          type: string
+        token_type:
+          type: string
+          enum:
+          - bearer
+    VerificationRequest:
+      type: object
+      x-status: tbd
+      description: Registry lookup vs document upload undecided.
+      required:
+      - registration_number
+      properties:
+        registration_number:
+          type: string
+    Verification:
+      type: object
+      x-status: tbd
+      required:
+      - status
+      properties:
+        status:
+          type: string
+          enum:
+          - PENDING
+          - VERIFIED
+          - REJECTED
+    PhotoUploadRequest:
+      type: object
+      required:
+      - count
+      - content_type
+      properties:
+        count:
+          type: integer
+          minimum: 1
+          maximum: 3
+        content_type:
+          type: string
+          enum:
+          - image/jpeg
+          - image/png
+    PhotoUploadResponse:
+      type: object
+      required:
+      - uploads
+      properties:
+        uploads:
+          type: array
+          minItems: 1
+          maxItems: 3
+          items:
+            type: object
+            required:
+            - upload_url
+            - photo_id
+            properties:
+              upload_url:
+                type: string
+                format: uri
+              photo_id:
+                type: string
+    IntroDraftRequest:
+      type: object
+      description: Profile fields used as AI input.
+      properties:
+        industry:
+          $ref: '#/components/schemas/BusinessProfile/properties/industry'
+        main_customers:
+          $ref: '#/components/schemas/BusinessProfile/properties/main_customers'
+        quiet_hours:
+          $ref: '#/components/schemas/BusinessProfile/properties/quiet_hours'
+        mood_tags:
+          $ref: '#/components/schemas/BusinessProfile/properties/mood_tags'
+    IntroDraft:
+      allOf:
+      - $ref: '#/components/schemas/AIGeneratedMeta'
+      - type: object
+        required:
+        - intro
+        properties:
+          intro:
+            type: string
+            maxLength: 60
+    ConsentRequest:
+      type: object
+      required:
+      - consents
+      properties:
+        consents:
+          type: array
+          items:
+            type: object
+            required:
+            - type
+            - accepted
+            properties:
+              type:
+                type: string
+                description: Consent types not yet defined; TERMS is an example.
+              accepted:
+                type: boolean
+    Recommendation:
+      allOf:
+      - $ref: '#/components/schemas/AIGeneratedMeta'
+      - type: object
+        required:
+        - business
+        - reason
+        properties:
+          business:
+            allOf:
+            - type: object
+              required:
+              - id
+              - name
+              properties:
+                id:
+                  type: string
+                name:
+                  type: string
+            - $ref: '#/components/schemas/BusinessProfile'
+          reason:
+            type: string
+            description: AI-generated explanation.
+    RecommendationPreferences:
+      type: object
+      properties:
+        preferred_industries:
+          type: array
+          items:
+            type: string
+            enum: *id008
+        preferred_mood_tags:
+          type: array
+          items:
+            type: string
+            enum: *id009
+    Post:
+      type: object
+      required:
+      - id
+      - business_id
+      - title
+      - body
+      - created_at
+      properties:
+        id:
+          type: string
+        business_id:
+          type: string
+        title:
+          type: string
+        body:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+    PostCreate:
+      type: object
+      required:
+      - title
+      - body
+      properties:
+        title:
+          type: string
+          minLength: 1
+        body:
+          type: string
+          minLength: 1
+    Ideas:
+      allOf:
+      - $ref: '#/components/schemas/AIGeneratedMeta'
+      - type: object
+        required:
+        - ideas
+        - promo_text
+        properties:
+          ideas:
+            type: array
+            items:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+          promo_text:
+            type: string
+    MarketingLinkCreate:
+      type: object
+      x-status: tbd
+      required:
+      - kind
+      - url
+      properties:
+        kind:
+          type: string
+          enum:
+          - INSTAGRAM
+        url:
+          type: string
+          format: uri
+    MarketingLink:
+      type: object
+      x-status: tbd
+      description: AI input only, never shown to other owners.
+      required:
+      - id
+      - kind
+      - url
+      properties:
+        id:
+          type: string
+        kind:
+          type: string
+        url:
+          type: string
+          format: uri
+    CouponScanResult:
+      type: object
+      x-status: tbd
+      description: Scope (scan vs redemption) undecided.
+      required:
+      - recorded
+      properties:
+        recorded:
+          type: boolean
+    Measurement:
+      type: object
+      x-status: tbd
+      required:
+      - coupon_code
+      - scans
+      - redemptions
+      properties:
+        coupon_code:
+          type: string
+        scans:
+          type: integer
+        redemptions:
+          type: integer
+    Neighborhood:
+      type: object
+      required:
+      - id
+      - name
+      properties:
+        id:
+          type: string
+          pattern: ^nbh_[0-9]{3}$
+        name:
+          type: string
+    CourseCreate:
+      type: object
+      x-status: tbd
+      required:
+      - neighborhood_id
+      - business_ids
+      properties:
+        neighborhood_id:
+          type: string
+        business_ids:
+          type: array
+          minItems: 2
+          items:
+            type: string
+    CourseStop:
+      type: object
+      x-status: tbd
+      required:
+      - order
+      - business_id
+      properties:
+        order:
+          type: integer
+          minimum: 1
+        business_id:
+          type: string
+        benefit:
+          type: string
+    Course:
+      type: object
+      x-status: tbd
+      description: Course flow undecided; AI draft plus owner confirmation is only a proposal.
+      required:
+      - id
+      - slug
+      - neighborhood_id
+      - title
+      - stops
+      - status
+      properties:
+        id:
+          type: string
+        slug:
+          type: string
+        neighborhood_id:
+          type: string
+        title:
+          type: string
+        stops:
+          type: array
+          items:
+            $ref: '#/components/schemas/CourseStop'
+        status:
+          type: string
+          enum:
+          - DRAFT
+          - CONFIRMED
+          - PUBLISHED

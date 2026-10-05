@@ -34,6 +34,10 @@ pytest -q
 
 CI (`.github/workflows/ci.yml`) runs the same lint and tests on every push and pull request.
 
+## API contract
+
+`api/openapi.yaml` is the **DRAFT** OpenAPI 3.1 contract derived from `docs/endpoints.md`. It needs agreement with the frontend and UI teammates; no endpoint is implemented yet. `tests/test_openapi_contract.py` keeps it consistent with the endpoint table, error codes and domain enums.
+
 ## Folders
 
 - `app/main.py` – FastAPI entrypoint.
