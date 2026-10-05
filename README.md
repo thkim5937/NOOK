@@ -18,6 +18,22 @@ uvicorn app.main:app --reload
 
 Check: `curl -i http://127.0.0.1:8000/health` → `{"status":"ok"}`
 
+## Development
+
+```bash
+pip install -r requirements-dev.txt
+```
+
+```bash
+ruff check .
+```
+
+```bash
+pytest -q
+```
+
+CI (`.github/workflows/ci.yml`) runs the same lint and tests on every push and pull request.
+
 ## Folders
 
 - `app/main.py` – FastAPI entrypoint.
