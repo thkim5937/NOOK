@@ -1,0 +1,453 @@
+{
+  "meta": {
+    "note": "ALL shops here are FICTIONAL. Option lists are PROVISIONAL: the UI teammate will decide the final lists. The database schema is owned by the data teammate; this file is not it.",
+    "provisional_options": {
+      "industry": [
+        "cafe",
+        "bakery",
+        "restaurant",
+        "bookstore",
+        "flower_shop",
+        "gallery",
+        "fitness_studio",
+        "pottery_workshop",
+        "vintage_shop",
+        "bar"
+      ],
+      "main_customers": [
+        "students",
+        "office_workers",
+        "families",
+        "tourists",
+        "seniors",
+        "couples"
+      ],
+      "quiet_hours": [
+        "weekday_morning",
+        "weekday_afternoon",
+        "weekday_evening",
+        "weekend_morning",
+        "weekend_afternoon",
+        "weekend_evening"
+      ],
+      "mood_tags": [
+        "quiet",
+        "emotional",
+        "lively",
+        "cozy",
+        "trendy",
+        "vintage",
+        "minimal",
+        "family_friendly"
+      ]
+    }
+  },
+  "neighborhoods": [
+    {
+      "id": "nbh_001",
+      "name": "달빛골목"
+    },
+    {
+      "id": "nbh_002",
+      "name": "솔향마을"
+    }
+  ],
+  "businesses": [
+    {
+      "id": "biz_001",
+      "name": "달빛다방",
+      "neighborhood_id": "nbh_001",
+      "industry": "cafe",
+      "main_customers": [
+        "students"
+      ],
+      "quiet_hours": [
+        "weekday_afternoon"
+      ],
+      "mood_tags": [
+        "quiet",
+        "cozy"
+      ],
+      "intro": "조용히 공부하기 좋은 골목 안쪽 작은 다방"
+    },
+    {
+      "id": "biz_002",
+      "name": "오후세시 커피",
+      "neighborhood_id": "nbh_001",
+      "industry": "cafe",
+      "main_customers": [
+        "office_workers",
+        "couples"
+      ],
+      "quiet_hours": [
+        "weekday_morning"
+      ],
+      "mood_tags": [
+        "trendy",
+        "lively"
+      ],
+      "intro": "직접 볶은 원두와 감각적인 인테리어의 카페"
+    },
+    {
+      "id": "biz_003",
+      "name": "밀밭제빵소",
+      "neighborhood_id": "nbh_001",
+      "industry": "bakery",
+      "main_customers": [
+        "families",
+        "seniors"
+      ],
+      "quiet_hours": [
+        "weekday_afternoon"
+      ],
+      "mood_tags": [
+        "cozy",
+        "family_friendly"
+      ],
+      "intro": "매일 아침 구워내는 담백한 식빵과 소보로"
+    },
+    {
+      "id": "biz_004",
+      "name": "버터와 소금",
+      "neighborhood_id": "nbh_001",
+      "industry": "bakery",
+      "main_customers": [
+        "couples",
+        "tourists"
+      ],
+      "quiet_hours": [
+        "weekend_morning"
+      ],
+      "mood_tags": [
+        "trendy",
+        "emotional"
+      ],
+      "intro": "겹겹이 바삭한 크루아상이 자랑인 작은 빵집"
+    },
+    {
+      "id": "biz_005",
+      "name": "나물한상",
+      "neighborhood_id": "nbh_001",
+      "industry": "restaurant",
+      "main_customers": [
+        "seniors",
+        "families"
+      ],
+      "quiet_hours": [
+        "weekday_afternoon",
+        "weekend_afternoon"
+      ],
+      "mood_tags": [
+        "cozy",
+        "family_friendly"
+      ],
+      "intro": "제철 나물과 구수한 된장찌개 백반집"
+    },
+    {
+      "id": "biz_006",
+      "name": "느린책방",
+      "neighborhood_id": "nbh_001",
+      "industry": "bookstore",
+      "main_customers": [
+        "students"
+      ],
+      "quiet_hours": [
+        "weekday_afternoon",
+        "weekday_evening"
+      ],
+      "mood_tags": [
+        "quiet",
+        "emotional"
+      ],
+      "intro": "혼자 머물며 천천히 읽기 좋은 독립서점"
+    },
+    {
+      "id": "biz_007",
+      "name": "꽃잎상점",
+      "neighborhood_id": "nbh_001",
+      "industry": "flower_shop",
+      "main_customers": [
+        "couples",
+        "office_workers"
+      ],
+      "quiet_hours": [
+        "weekday_morning"
+      ],
+      "mood_tags": [
+        "emotional",
+        "cozy"
+      ],
+      "intro": "계절 꽃으로 만드는 작은 다발과 화분"
+    },
+    {
+      "id": "biz_008",
+      "name": "빈칸갤러리",
+      "neighborhood_id": "nbh_001",
+      "industry": "gallery",
+      "main_customers": [
+        "tourists",
+        "couples"
+      ],
+      "quiet_hours": [
+        "weekday_afternoon"
+      ],
+      "mood_tags": [
+        "minimal",
+        "quiet"
+      ],
+      "intro": "신진 작가의 전시를 여는 하얀 벽의 작은 갤러리"
+    },
+    {
+      "id": "biz_009",
+      "name": "다락방 옷가게",
+      "neighborhood_id": "nbh_001",
+      "industry": "vintage_shop",
+      "main_customers": [
+        "students",
+        "tourists"
+      ],
+      "quiet_hours": [
+        "weekend_morning"
+      ],
+      "mood_tags": [
+        "vintage",
+        "trendy"
+      ],
+      "intro": "직접 고른 빈티지 의류와 소품을 파는 가게"
+    },
+    {
+      "id": "biz_010",
+      "name": "골목 끝 술집",
+      "neighborhood_id": "nbh_001",
+      "industry": "bar",
+      "main_customers": [
+        "office_workers",
+        "couples"
+      ],
+      "quiet_hours": [
+        "weekday_evening"
+      ],
+      "mood_tags": [
+        "lively",
+        "vintage"
+      ],
+      "intro": "퇴근 후 한잔하기 좋은 레트로 감성의 술집"
+    },
+    {
+      "id": "biz_011",
+      "name": "숨쉬는 필라테스",
+      "neighborhood_id": "nbh_001",
+      "industry": "fitness_studio",
+      "main_customers": [
+        "office_workers"
+      ],
+      "quiet_hours": [
+        "weekday_morning",
+        "weekday_evening"
+      ],
+      "mood_tags": [
+        "minimal",
+        "quiet"
+      ],
+      "intro": "소규모 그룹 수업으로 운영하는 필라테스 스튜디오"
+    },
+    {
+      "id": "biz_012",
+      "name": "햇살머금은 카페",
+      "neighborhood_id": "nbh_002",
+      "industry": "cafe",
+      "main_customers": [
+        "families",
+        "seniors"
+      ],
+      "quiet_hours": [
+        "weekday_morning"
+      ],
+      "mood_tags": [
+        "cozy",
+        "family_friendly"
+      ],
+      "intro": "넓은 창으로 햇살이 가득 들어오는 동네 카페"
+    },
+    {
+      "id": "biz_013",
+      "name": "소란스런 다락",
+      "neighborhood_id": "nbh_002",
+      "industry": "cafe",
+      "main_customers": [
+        "students",
+        "couples"
+      ],
+      "quiet_hours": [
+        "weekend_afternoon"
+      ],
+      "mood_tags": [
+        "lively",
+        "trendy"
+      ],
+      "intro": "음악과 수다가 어우러지는 활기찬 디저트 카페"
+    },
+    {
+      "id": "biz_014",
+      "name": "참나무 빵공방",
+      "neighborhood_id": "nbh_002",
+      "industry": "bakery",
+      "main_customers": [
+        "families"
+      ],
+      "quiet_hours": [
+        "weekend_morning"
+      ],
+      "mood_tags": [
+        "family_friendly",
+        "vintage"
+      ],
+      "intro": "천연 발효종으로 굽는 묵직한 시골빵 전문점"
+    },
+    {
+      "id": "biz_015",
+      "name": "여우골 식당",
+      "neighborhood_id": "nbh_002",
+      "industry": "restaurant",
+      "main_customers": [
+        "office_workers",
+        "tourists"
+      ],
+      "quiet_hours": [
+        "weekday_evening"
+      ],
+      "mood_tags": [
+        "lively",
+        "trendy"
+      ],
+      "intro": "점심엔 한식 정식, 저녁엔 안주가 되는 퓨전 식당"
+    },
+    {
+      "id": "biz_016",
+      "name": "엄마손 밥상",
+      "neighborhood_id": "nbh_002",
+      "industry": "restaurant",
+      "main_customers": [
+        "seniors",
+        "families"
+      ],
+      "quiet_hours": [
+        "weekday_afternoon"
+      ],
+      "mood_tags": [
+        "cozy",
+        "emotional"
+      ],
+      "intro": "집밥이 그리울 때 찾는 정갈한 가정식 식당"
+    },
+    {
+      "id": "biz_017",
+      "name": "한뼘서재",
+      "neighborhood_id": "nbh_002",
+      "industry": "bookstore",
+      "main_customers": [
+        "students",
+        "seniors"
+      ],
+      "quiet_hours": [
+        "weekday_morning"
+      ],
+      "mood_tags": [
+        "quiet",
+        "minimal"
+      ],
+      "intro": "한 켠에 조용한 독서 공간을 둔 동네 책방"
+    },
+    {
+      "id": "biz_018",
+      "name": "초록손 화원",
+      "neighborhood_id": "nbh_002",
+      "industry": "flower_shop",
+      "main_customers": [
+        "families",
+        "seniors"
+      ],
+      "quiet_hours": [
+        "weekend_morning"
+      ],
+      "mood_tags": [
+        "cozy",
+        "vintage"
+      ],
+      "intro": "작은 화분과 허브를 가꿔 파는 오래된 화원"
+    },
+    {
+      "id": "biz_019",
+      "name": "물결 아틀리에",
+      "neighborhood_id": "nbh_002",
+      "industry": "gallery",
+      "main_customers": [
+        "tourists",
+        "couples"
+      ],
+      "quiet_hours": [
+        "weekend_afternoon"
+      ],
+      "mood_tags": [
+        "emotional",
+        "minimal"
+      ],
+      "intro": "수채화 원화 전시와 작은 엽서를 만나는 공간"
+    },
+    {
+      "id": "biz_020",
+      "name": "흙내음 공방",
+      "neighborhood_id": "nbh_002",
+      "industry": "pottery_workshop",
+      "main_customers": [
+        "couples",
+        "families"
+      ],
+      "quiet_hours": [
+        "weekend_afternoon"
+      ],
+      "mood_tags": [
+        "emotional",
+        "cozy"
+      ],
+      "intro": "물레 체험과 나만의 그릇 만들기 원데이 클래스"
+    },
+    {
+      "id": "biz_021",
+      "name": "낡은 서랍",
+      "neighborhood_id": "nbh_002",
+      "industry": "vintage_shop",
+      "main_customers": [
+        "tourists",
+        "students"
+      ],
+      "quiet_hours": [
+        "weekend_afternoon"
+      ],
+      "mood_tags": [
+        "vintage",
+        "lively"
+      ],
+      "intro": "오래된 가구와 생활 소품을 모아둔 골동품 가게"
+    },
+    {
+      "id": "biz_022",
+      "name": "별헤는 밤 바",
+      "neighborhood_id": "nbh_002",
+      "industry": "bar",
+      "main_customers": [
+        "couples",
+        "office_workers"
+      ],
+      "quiet_hours": [
+        "weekday_evening",
+        "weekend_evening"
+      ],
+      "mood_tags": [
+        "quiet",
+        "emotional"
+      ],
+      "intro": "조용히 이야기 나누기 좋은 칵테일 바"
+    }
+  ]
+}

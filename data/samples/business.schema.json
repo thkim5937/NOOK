@@ -1,0 +1,194 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "NOOK sample businesses (DRAFT, provisional)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "meta",
+    "neighborhoods",
+    "businesses"
+  ],
+  "properties": {
+    "meta": {
+      "type": "object",
+      "required": [
+        "note",
+        "provisional_options"
+      ],
+      "properties": {
+        "note": {
+          "type": "string",
+          "minLength": 1
+        },
+        "provisional_options": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "industry",
+            "main_customers",
+            "quiet_hours",
+            "mood_tags"
+          ],
+          "properties": {
+            "industry": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "string"
+              }
+            },
+            "main_customers": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "string"
+              }
+            },
+            "quiet_hours": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "string"
+              }
+            },
+            "mood_tags": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "neighborhoods": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^nbh_[0-9]{3}$"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "businesses": {
+      "type": "array",
+      "minItems": 20,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "neighborhood_id",
+          "industry",
+          "main_customers",
+          "quiet_hours",
+          "mood_tags",
+          "intro"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^biz_[0-9]{3}$"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "neighborhood_id": {
+            "type": "string",
+            "pattern": "^nbh_[0-9]{3}$"
+          },
+          "industry": {
+            "enum": [
+              "cafe",
+              "bakery",
+              "restaurant",
+              "bookstore",
+              "flower_shop",
+              "gallery",
+              "fitness_studio",
+              "pottery_workshop",
+              "vintage_shop",
+              "bar"
+            ]
+          },
+          "main_customers": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 2,
+            "uniqueItems": true,
+            "items": {
+              "enum": [
+                "students",
+                "office_workers",
+                "families",
+                "tourists",
+                "seniors",
+                "couples"
+              ]
+            }
+          },
+          "quiet_hours": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 2,
+            "uniqueItems": true,
+            "items": {
+              "enum": [
+                "weekday_morning",
+                "weekday_afternoon",
+                "weekday_evening",
+                "weekend_morning",
+                "weekend_afternoon",
+                "weekend_evening"
+              ]
+            }
+          },
+          "mood_tags": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 3,
+            "uniqueItems": true,
+            "items": {
+              "enum": [
+                "quiet",
+                "emotional",
+                "lively",
+                "cozy",
+                "trendy",
+                "vintage",
+                "minimal",
+                "family_friendly"
+              ]
+            }
+          },
+          "intro": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 60
+          }
+        }
+      }
+    }
+  }
+}
