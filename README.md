@@ -1,6 +1,6 @@
 # NOOK backend
 
-Collaboration-matching service for local shop owners (Python 3.11+, FastAPI).
+Collaboration-matching service for local shop owners (Python 3.12+, FastAPI).
 
 ## Run locally
 
