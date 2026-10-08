@@ -19,8 +19,8 @@ class InMemoryCollabRequestRepository:
             raise NotFoundInRepository(request.id)
         self._items[request.id] = request  # same key: position preserved
 
-    def list_sent(self, business_id: str) -> list[CollabRequest]:
+    def list_sent(self, business_id: int) -> list[CollabRequest]:
         return [r for r in self._items.values() if r.sender_business_id == business_id]
 
-    def list_received(self, business_id: str) -> list[CollabRequest]:
-        return [r for r in self._items.values() if r.recipient_business_id == business_id]
+    def list_received(self, business_id: int) -> list[CollabRequest]:
+        return [r for r in self._items.values() if r.receiver_business_id == business_id]

@@ -1341,20 +1341,21 @@ components:
         source:
           type: string
           enum:
-          - RECOMMENDATION
-          - LOVE_CALL
-          - PROFILE
+          - ai_recommendation
+          - collab_post
+          - profile
         status:
           type: string
           enum:
           - PENDING
           - ACCEPTED
           - REJECTED
+          - CANCELLED
         post_id:
           type:
           - string
           - 'null'
-          description: Set when source is LOVE_CALL.
+          description: Set when source is collab_post.
     CollabRequestCreate:
       type: object
       required:

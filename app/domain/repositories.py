@@ -24,10 +24,10 @@ class CollabRequestRepository(Protocol):
         """Replace an existing request. Raises NotFoundInRepository if unknown."""
         ...
 
-    def list_sent(self, business_id: str) -> list[CollabRequest]:
+    def list_sent(self, business_id: int) -> list[CollabRequest]:
         """Requests sent by business_id, in insertion order."""
         ...
 
-    def list_received(self, business_id: str) -> list[CollabRequest]:
+    def list_received(self, business_id: int) -> list[CollabRequest]:
         """Requests received by business_id, in insertion order."""
         ...
