@@ -6,6 +6,8 @@ and `tests/test_sample_data.py`.
 
 - **Purpose:** let backend work and tests (e.g. an LLM recommendation spike) start
   before the real schema and seed data exist.
+- **IDs:** shop `id` is an integer >= 1 (matches the database `bigint` and the
+  contract's `*_business_id` fields); ids are unique across the dataset.
 - **Fictional:** every shop, name and neighborhood is made up. No real shops or brands.
 - **Provisional:** the option lists (industry, main_customers, quiet_hours, mood_tags)
   are NOT final. The UI/data teammates will decide the final lists and this file

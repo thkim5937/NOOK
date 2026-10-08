@@ -190,7 +190,7 @@ paths:
               example:
                 data:
                 - business:
-                    id: biz_003
+                    id: 3
                     name: 밀밭제빵소
                     neighborhood_id: nbh_001
                     industry: cafe
@@ -946,6 +946,7 @@ components:
     BusinessProfile:
       type: object
       required:
+      - id
       - industry
       - main_customers
       - quiet_hours
@@ -956,6 +957,9 @@ components:
         lists.
       x-provisional: true
       properties:
+        id:
+          type: integer
+          minimum: 1
         industry:
           type: string
           enum:
@@ -1111,7 +1115,8 @@ components:
               - name
               properties:
                 id:
-                  type: string
+                  type: integer
+                  minimum: 1
                 name:
                   type: string
             - $ref: '#/components/schemas/BusinessProfile'

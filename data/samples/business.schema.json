@@ -107,8 +107,8 @@
         ],
         "properties": {
           "id": {
-            "type": "string",
-            "pattern": "^biz_[0-9]{3}$"
+            "type": "integer",
+            "minimum": 1
           },
           "name": {
             "type": "string",

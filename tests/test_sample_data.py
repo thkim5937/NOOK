@@ -30,6 +30,13 @@ def test_ids_unique():
     assert len(ids) == len(set(ids))
 
 
+def test_ids_are_positive_integers():
+    assert len(BUSINESSES) == 22
+    for b in BUSINESSES:
+        assert isinstance(b["id"], int) and not isinstance(b["id"], bool)
+        assert b["id"] >= 1
+
+
 def test_neighborhoods():
     ids = {n["id"] for n in DATA["neighborhoods"]}
     assert len(ids) >= 2

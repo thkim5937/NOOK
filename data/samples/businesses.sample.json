@@ -54,7 +54,7 @@
   ],
   "businesses": [
     {
-      "id": "biz_001",
+      "id": 1,
       "name": "달빛다방",
       "neighborhood_id": "nbh_001",
       "industry": "cafe",
@@ -71,7 +71,7 @@
       "intro": "조용히 공부하기 좋은 골목 안쪽 작은 다방"
     },
     {
-      "id": "biz_002",
+      "id": 2,
       "name": "오후세시 커피",
       "neighborhood_id": "nbh_001",
       "industry": "cafe",
@@ -89,7 +89,7 @@
       "intro": "직접 볶은 원두와 감각적인 인테리어의 카페"
     },
     {
-      "id": "biz_003",
+      "id": 3,
       "name": "밀밭제빵소",
       "neighborhood_id": "nbh_001",
       "industry": "bakery",
@@ -107,7 +107,7 @@
       "intro": "매일 아침 구워내는 담백한 식빵과 소보로"
     },
     {
-      "id": "biz_004",
+      "id": 4,
       "name": "버터와 소금",
       "neighborhood_id": "nbh_001",
       "industry": "bakery",
@@ -125,7 +125,7 @@
       "intro": "겹겹이 바삭한 크루아상이 자랑인 작은 빵집"
     },
     {
-      "id": "biz_005",
+      "id": 5,
       "name": "나물한상",
       "neighborhood_id": "nbh_001",
       "industry": "restaurant",
@@ -144,7 +144,7 @@
       "intro": "제철 나물과 구수한 된장찌개 백반집"
     },
     {
-      "id": "biz_006",
+      "id": 6,
       "name": "느린책방",
       "neighborhood_id": "nbh_001",
       "industry": "bookstore",
@@ -162,7 +162,7 @@
       "intro": "혼자 머물며 천천히 읽기 좋은 독립서점"
     },
     {
-      "id": "biz_007",
+      "id": 7,
       "name": "꽃잎상점",
       "neighborhood_id": "nbh_001",
       "industry": "flower_shop",
@@ -180,7 +180,7 @@
       "intro": "계절 꽃으로 만드는 작은 다발과 화분"
     },
     {
-      "id": "biz_008",
+      "id": 8,
       "name": "빈칸갤러리",
       "neighborhood_id": "nbh_001",
       "industry": "gallery",
@@ -198,7 +198,7 @@
       "intro": "신진 작가의 전시를 여는 하얀 벽의 작은 갤러리"
     },
     {
-      "id": "biz_009",
+      "id": 9,
       "name": "다락방 옷가게",
       "neighborhood_id": "nbh_001",
       "industry": "vintage_shop",
@@ -216,7 +216,7 @@
       "intro": "직접 고른 빈티지 의류와 소품을 파는 가게"
     },
     {
-      "id": "biz_010",
+      "id": 10,
       "name": "골목 끝 술집",
       "neighborhood_id": "nbh_001",
       "industry": "bar",
@@ -234,7 +234,7 @@
       "intro": "퇴근 후 한잔하기 좋은 레트로 감성의 술집"
     },
     {
-      "id": "biz_011",
+      "id": 11,
       "name": "숨쉬는 필라테스",
       "neighborhood_id": "nbh_001",
       "industry": "fitness_studio",
@@ -252,7 +252,7 @@
       "intro": "소규모 그룹 수업으로 운영하는 필라테스 스튜디오"
     },
     {
-      "id": "biz_012",
+      "id": 12,
       "name": "햇살머금은 카페",
       "neighborhood_id": "nbh_002",
       "industry": "cafe",
@@ -270,7 +270,7 @@
       "intro": "넓은 창으로 햇살이 가득 들어오는 동네 카페"
     },
     {
-      "id": "biz_013",
+      "id": 13,
       "name": "소란스런 다락",
       "neighborhood_id": "nbh_002",
       "industry": "cafe",
@@ -288,7 +288,7 @@
       "intro": "음악과 수다가 어우러지는 활기찬 디저트 카페"
     },
     {
-      "id": "biz_014",
+      "id": 14,
       "name": "참나무 빵공방",
       "neighborhood_id": "nbh_002",
       "industry": "bakery",
@@ -305,7 +305,7 @@
       "intro": "천연 발효종으로 굽는 묵직한 시골빵 전문점"
     },
     {
-      "id": "biz_015",
+      "id": 15,
       "name": "여우골 식당",
       "neighborhood_id": "nbh_002",
       "industry": "restaurant",
@@ -323,7 +323,7 @@
       "intro": "점심엔 한식 정식, 저녁엔 안주가 되는 퓨전 식당"
     },
     {
-      "id": "biz_016",
+      "id": 16,
       "name": "엄마손 밥상",
       "neighborhood_id": "nbh_002",
       "industry": "restaurant",
@@ -341,7 +341,7 @@
       "intro": "집밥이 그리울 때 찾는 정갈한 가정식 식당"
     },
     {
-      "id": "biz_017",
+      "id": 17,
       "name": "한뼘서재",
       "neighborhood_id": "nbh_002",
       "industry": "bookstore",
@@ -359,7 +359,7 @@
       "intro": "한 켠에 조용한 독서 공간을 둔 동네 책방"
     },
     {
-      "id": "biz_018",
+      "id": 18,
       "name": "초록손 화원",
       "neighborhood_id": "nbh_002",
       "industry": "flower_shop",
@@ -377,7 +377,7 @@
       "intro": "작은 화분과 허브를 가꿔 파는 오래된 화원"
     },
     {
-      "id": "biz_019",
+      "id": 19,
       "name": "물결 아틀리에",
       "neighborhood_id": "nbh_002",
       "industry": "gallery",
@@ -395,7 +395,7 @@
       "intro": "수채화 원화 전시와 작은 엽서를 만나는 공간"
     },
     {
-      "id": "biz_020",
+      "id": 20,
       "name": "흙내음 공방",
       "neighborhood_id": "nbh_002",
       "industry": "pottery_workshop",
@@ -413,7 +413,7 @@
       "intro": "물레 체험과 나만의 그릇 만들기 원데이 클래스"
     },
     {
-      "id": "biz_021",
+      "id": 21,
       "name": "낡은 서랍",
       "neighborhood_id": "nbh_002",
       "industry": "vintage_shop",
@@ -431,7 +431,7 @@
       "intro": "오래된 가구와 생활 소품을 모아둔 골동품 가게"
     },
     {
-      "id": "biz_022",
+      "id": 22,
       "name": "별헤는 밤 바",
       "neighborhood_id": "nbh_002",
       "industry": "bar",
