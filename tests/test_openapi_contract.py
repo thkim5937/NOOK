@@ -76,3 +76,22 @@ def test_no_auth_paths_and_public_security_empty():
     for (method, path), op in _operations().items():
         if path.startswith("/v1/public"):
             assert op["security"] == [], (method, path)
+
+
+def test_business_scoped_paths_declare_business_id():
+    assert not any(path.startswith("/v1/me/business") for path in SPEC["paths"])
+    components = SPEC["components"]["parameters"]
+    for path, item in SPEC["paths"].items():
+        if "{business_id}" not in path:
+            continue
+        for method, op in item.items():
+            if method not in HTTP_METHODS:
+                continue
+            params = [
+                components[p["$ref"].rsplit("/", 1)[1]] if "$ref" in p else p
+                for p in item.get("parameters", []) + op.get("parameters", [])
+            ]
+            match = [p for p in params if p["name"] == "business_id"]
+            assert match, (method, path)
+            assert match[0]["in"] == "path" and match[0]["required"] is True, (method, path)
+            assert match[0]["schema"]["type"] == "integer", (method, path)

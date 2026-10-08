@@ -1,15 +1,15 @@
-# DRAFT v0.1 - needs agreement with the frontend and UI teammates. Generated once, now edited by hand.
+# DRAFT v0.2 - needs agreement with the frontend and UI teammates. Generated once, now edited by hand.
 openapi: 3.1.0
 info:
   title: NOOK API
-  version: 0.1.0-draft
-  summary: DRAFT v0.1 - needs agreement with the frontend and UI teammates before it is treated as final
-  description: '**DRAFT v0.1 - needs agreement with the frontend and UI teammates before it is treated
+  version: 0.2.0-draft
+  summary: DRAFT v0.2 - needs agreement with the frontend and UI teammates before it is treated as final
+  description: '**DRAFT v0.2 - needs agreement with the frontend and UI teammates before it is treated
     as final.**
 
 
     Derived from docs/endpoints.md. Operations marked `x-status: tbd` have open decisions (login method,
-    course flow, marketing links, coupon scope) and their shapes are placeholders. No endpoint is implemented
+    marketing links, coupon scope) and their shapes are placeholders. No endpoint is implemented
     yet.
 
 
@@ -28,24 +28,20 @@ tags:
   description: F2 AI recommendations
 - name: collab-requests
   description: F3 collaboration requests
-- name: posts
-  description: F4 recruitment posts / love calls
 - name: ideas
   description: F6 AI collaboration ideas
-- name: courses
-  description: F8 collaboration courses (owner side, tbd)
-- name: public
-  description: Public pages, no login
 - name: tbd
   description: 'F5 marketing links and F7 coupons/measurements: scope undecided'
 paths:
-  /v1/me/business/verification:
+  /v1/businesses/{business_id}/verification:
     post:
       tags:
       - business-profile
       summary: Verify the business registration number
-      operationId: post_v1_me_business_verification
+      operationId: post_v1_businesses_business_id_verification
       x-status: tbd
+      parameters:
+      - $ref: '#/components/parameters/BusinessId'
       requestBody:
         required: true
         content:
@@ -71,134 +67,41 @@ paths:
                   status: PENDING
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
         '422':
           $ref: '#/components/responses/ValidationFailed'
       security:
       - bearerAuth: []
       description: Open decision, see docs/endpoints.md; shape is a placeholder.
-  /v1/me/business:
-    get:
-      tags:
-      - business-profile
-      summary: Read own shop profile
-      operationId: get_v1_me_business
-      x-status: draft
-      responses:
-        '200':
-          description: Success.
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                - data
-                properties:
-                  data:
-                    $ref: '#/components/schemas/BusinessProfile'
-              example:
-                data: &id001
-                  neighborhood_id: nbh_001
-                  industry: cafe
-                  main_customers: &id002
-                  - students
-                  quiet_hours: &id003
-                  - weekday_afternoon
-                  mood_tags: &id004
-                  - quiet
-                  - cozy
-                  intro: 조용히 공부하기 좋은 골목 안쪽 작은 다방
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-      security:
-      - bearerAuth: []
-    put:
-      tags:
-      - business-profile
-      summary: Save own shop profile
-      operationId: put_v1_me_business
-      x-status: draft
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/BusinessProfile'
-            example: *id001
-      responses:
-        '200':
-          description: Success.
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                - data
-                properties:
-                  data:
-                    $ref: '#/components/schemas/BusinessProfile'
-              example:
-                data: *id001
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '422':
-          $ref: '#/components/responses/ValidationFailed'
-      security:
-      - bearerAuth: []
-  /v1/me/business/photos:
-    post:
-      tags:
-      - business-profile
-      summary: Get presigned upload URLs for shop photos (1-3)
-      operationId: post_v1_me_business_photos
-      x-status: draft
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PhotoUploadRequest'
-            example:
-              count: 2
-              content_type: image/jpeg
-      responses:
-        '200':
-          description: Success.
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                - data
-                properties:
-                  data:
-                    $ref: '#/components/schemas/PhotoUploadResponse'
-              example:
-                data:
-                  uploads:
-                  - upload_url: https://storage.example.test/upload/abc
-                    photo_id: photo_001
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '422':
-          $ref: '#/components/responses/ValidationFailed'
-      security:
-      - bearerAuth: []
-  /v1/me/business/intro-draft:
+  /v1/businesses/{business_id}/intro-draft:
     post:
       tags:
       - business-profile
       summary: AI-generated one-line intro draft for the owner to edit
-      operationId: post_v1_me_business_intro_draft
+      operationId: post_v1_businesses_business_id_intro_draft
       x-status: draft
+      parameters:
+      - $ref: '#/components/parameters/BusinessId'
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/IntroDraftRequest'
-            example: *id001
+            example: &id001
+              neighborhood_id: nbh_001
+              industry: cafe
+              main_customers: &id002
+              - students
+              quiet_hours: &id003
+              - weekday_afternoon
+              mood_tags: &id004
+              - quiet
+              - cozy
+              intro: 조용히 공부하기 좋은 골목 안쪽 작은 다방
       responses:
         '200':
           description: Success.
@@ -218,6 +121,10 @@ paths:
                   disclosure: This content was generated by AI.
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
         '422':
           $ref: '#/components/responses/ValidationFailed'
       security:
@@ -301,33 +208,6 @@ paths:
       - bearerAuth: []
       description: Response includes AI disclosure fields (`ai_generated`, `disclosure`); the client must
         show the disclosure.
-  /v1/recommendations/preferences:
-    post:
-      tags:
-      - recommendations
-      summary: Answer the AI's first-time question about the preferred partner
-      operationId: post_v1_recommendations_preferences
-      x-status: draft
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RecommendationPreferences'
-            example:
-              preferred_industries:
-              - bakery
-              preferred_mood_tags:
-              - cozy
-      responses:
-        '204':
-          description: Success, no body.
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '422':
-          $ref: '#/components/responses/ValidationFailed'
-      security:
-      - bearerAuth: []
   /v1/collab-requests:
     post:
       tags:
@@ -601,84 +481,6 @@ paths:
           $ref: '#/components/responses/InvalidState'
       security:
       - bearerAuth: []
-  /v1/posts:
-    get:
-      tags:
-      - posts
-      summary: List collaboration recruitment posts / love calls
-      operationId: get_v1_posts
-      x-status: draft
-      parameters:
-      - $ref: '#/components/parameters/Limit'
-      - $ref: '#/components/parameters/Cursor'
-      responses:
-        '200':
-          description: Success.
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                - data
-                - next_cursor
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Post'
-                  next_cursor:
-                    type:
-                    - string
-                    - 'null'
-                    description: Pass as `cursor` for the next page; null on the last page. DRAFT convention.
-              example:
-                data:
-                - &id006
-                  id: post_001
-                  business_id: biz_003
-                  title: Looking for a cafe partner for a morning bread-and-coffee set
-                  body: We bake fresh bread every morning and want a nearby cafe to pair it with.
-                  created_at: '2026-10-01T09:00:00Z'
-                next_cursor: null
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-      security:
-      - bearerAuth: []
-    post:
-      tags:
-      - posts
-      summary: Create a recruitment post / love call
-      operationId: post_v1_posts
-      x-status: draft
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PostCreate'
-            example:
-              title: Looking for a cafe partner for a morning bread-and-coffee set
-              body: We bake fresh bread every morning and want a nearby cafe to pair it with.
-      responses:
-        '201':
-          description: Success.
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                - data
-                properties:
-                  data:
-                    $ref: '#/components/schemas/Post'
-              example:
-                data: *id006
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '422':
-          $ref: '#/components/responses/ValidationFailed'
-      security:
-      - bearerAuth: []
   /v1/me/marketing-links:
     post:
       tags:
@@ -862,270 +664,6 @@ paths:
       security:
       - bearerAuth: []
       description: Open decision, see docs/endpoints.md; shape is a placeholder.
-  /v1/courses:
-    post:
-      tags:
-      - courses
-      summary: Create a collaboration course
-      operationId: post_v1_courses
-      x-status: tbd
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CourseCreate'
-            example:
-              neighborhood_id: nbh_001
-              business_ids:
-              - biz_001
-              - biz_003
-      responses:
-        '201':
-          description: Success.
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                - data
-                properties:
-                  data:
-                    $ref: '#/components/schemas/Course'
-              example:
-                data:
-                  id: crs_001
-                  slug: moonlight-alley-walk
-                  neighborhood_id: nbh_001
-                  title: Moonlight Alley slow afternoon
-                  stops: &id007
-                  - order: 1
-                    business_id: biz_001
-                    benefit: Free cookie with any drink
-                  - order: 2
-                    business_id: biz_003
-                    benefit: 10% off bread
-                  status: DRAFT
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '422':
-          $ref: '#/components/responses/ValidationFailed'
-      security:
-      - bearerAuth: []
-      description: Open decision, see docs/endpoints.md; shape is a placeholder.
-  /v1/courses/{id}/confirm:
-    post:
-      tags:
-      - courses
-      summary: Owner confirms the course
-      operationId: post_v1_courses_id_confirm
-      x-status: tbd
-      parameters:
-      - name: id
-        in: path
-        required: true
-        description: Course id
-        schema:
-          type: string
-        example: crs_001
-      responses:
-        '200':
-          description: Success.
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                - data
-                properties:
-                  data:
-                    $ref: '#/components/schemas/Course'
-              example:
-                data:
-                  id: crs_001
-                  slug: moonlight-alley-walk
-                  neighborhood_id: nbh_001
-                  title: Moonlight Alley slow afternoon
-                  stops: *id007
-                  status: CONFIRMED
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '409':
-          $ref: '#/components/responses/InvalidState'
-      security:
-      - bearerAuth: []
-      description: Open decision, see docs/endpoints.md; shape is a placeholder.
-  /v1/courses/{id}/publish:
-    post:
-      tags:
-      - courses
-      summary: Publish the course to the public page
-      operationId: post_v1_courses_id_publish
-      x-status: tbd
-      parameters:
-      - name: id
-        in: path
-        required: true
-        description: Course id
-        schema:
-          type: string
-        example: crs_001
-      responses:
-        '200':
-          description: Success.
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                - data
-                properties:
-                  data:
-                    $ref: '#/components/schemas/Course'
-              example:
-                data:
-                  id: crs_001
-                  slug: moonlight-alley-walk
-                  neighborhood_id: nbh_001
-                  title: Moonlight Alley slow afternoon
-                  stops: *id007
-                  status: PUBLISHED
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '409':
-          $ref: '#/components/responses/InvalidState'
-      security:
-      - bearerAuth: []
-      description: Open decision, see docs/endpoints.md; shape is a placeholder.
-  /v1/public/neighborhoods:
-    get:
-      tags:
-      - public
-      summary: Neighborhood list (customer picks manually, no GPS)
-      operationId: get_v1_public_neighborhoods
-      x-status: draft
-      parameters:
-      - $ref: '#/components/parameters/Limit'
-      - $ref: '#/components/parameters/Cursor'
-      responses:
-        '200':
-          description: Success.
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                - data
-                - next_cursor
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Neighborhood'
-                  next_cursor:
-                    type:
-                    - string
-                    - 'null'
-                    description: Pass as `cursor` for the next page; null on the last page. DRAFT convention.
-              example:
-                data:
-                - id: nbh_001
-                  name: 달빛골목
-                - id: nbh_002
-                  name: 솔향마을
-                next_cursor: null
-      security: []
-  /v1/public/neighborhoods/{id}/courses:
-    get:
-      tags:
-      - public
-      summary: Neighborhood overview and its collaboration courses
-      operationId: get_v1_public_neighborhoods_id_courses
-      x-status: draft
-      parameters:
-      - name: id
-        in: path
-        required: true
-        description: Neighborhood id
-        schema:
-          type: string
-        example: nbh_001
-      - $ref: '#/components/parameters/Limit'
-      - $ref: '#/components/parameters/Cursor'
-      responses:
-        '200':
-          description: Success.
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                - data
-                - next_cursor
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Course'
-                  next_cursor:
-                    type:
-                    - string
-                    - 'null'
-                    description: Pass as `cursor` for the next page; null on the last page. DRAFT convention.
-              example:
-                data:
-                - id: crs_001
-                  slug: moonlight-alley-walk
-                  neighborhood_id: nbh_001
-                  title: Moonlight Alley slow afternoon
-                  stops: *id007
-                  status: PUBLISHED
-                next_cursor: null
-        '404':
-          $ref: '#/components/responses/NotFound'
-      security: []
-  /v1/public/courses/{slug}:
-    get:
-      tags:
-      - public
-      summary: 'Course detail: ordered shops and benefits'
-      operationId: get_v1_public_courses_slug
-      x-status: draft
-      parameters:
-      - name: slug
-        in: path
-        required: true
-        description: Course slug
-        schema:
-          type: string
-        example: moonlight-alley-walk
-      responses:
-        '200':
-          description: Success.
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                - data
-                properties:
-                  data:
-                    $ref: '#/components/schemas/Course'
-              example:
-                data:
-                  id: crs_001
-                  slug: moonlight-alley-walk
-                  neighborhood_id: nbh_001
-                  title: Moonlight Alley slow afternoon
-                  stops: *id007
-                  status: PUBLISHED
-        '404':
-          $ref: '#/components/responses/NotFound'
-      security: []
 components:
   securitySchemes:
     bearerAuth:
@@ -1133,6 +671,13 @@ components:
       scheme: bearer
       description: login method undecided (app vs web), see docs/auth-options.md
   parameters:
+    BusinessId:
+      name: business_id
+      in: path
+      required: true
+      description: Business id; the caller must own it (one account can own several businesses).
+      schema:
+        type: integer
     Limit:
       name: limit
       in: query
@@ -1389,7 +934,7 @@ components:
       properties:
         industry:
           type: string
-          enum: &id008
+          enum:
           - cafe
           - bakery
           - restaurant
@@ -1441,7 +986,7 @@ components:
           uniqueItems: true
           items:
             type: string
-            enum: &id009
+            enum:
             - quiet
             - emotional
             - lively
@@ -1486,41 +1031,6 @@ components:
           - PENDING
           - VERIFIED
           - REJECTED
-    PhotoUploadRequest:
-      type: object
-      required:
-      - count
-      - content_type
-      properties:
-        count:
-          type: integer
-          minimum: 1
-          maximum: 3
-        content_type:
-          type: string
-          enum:
-          - image/jpeg
-          - image/png
-    PhotoUploadResponse:
-      type: object
-      required:
-      - uploads
-      properties:
-        uploads:
-          type: array
-          minItems: 1
-          maxItems: 3
-          items:
-            type: object
-            required:
-            - upload_url
-            - photo_id
-            properties:
-              upload_url:
-                type: string
-                format: uri
-              photo_id:
-                type: string
     IntroDraftRequest:
       type: object
       description: Profile fields used as AI input.
@@ -1584,51 +1094,6 @@ components:
           reason:
             type: string
             description: AI-generated explanation.
-    RecommendationPreferences:
-      type: object
-      properties:
-        preferred_industries:
-          type: array
-          items:
-            type: string
-            enum: *id008
-        preferred_mood_tags:
-          type: array
-          items:
-            type: string
-            enum: *id009
-    Post:
-      type: object
-      required:
-      - id
-      - business_id
-      - title
-      - body
-      - created_at
-      properties:
-        id:
-          type: string
-        business_id:
-          type: string
-        title:
-          type: string
-        body:
-          type: string
-        created_at:
-          type: string
-          format: date-time
-    PostCreate:
-      type: object
-      required:
-      - title
-      - body
-      properties:
-        title:
-          type: string
-          minLength: 1
-        body:
-          type: string
-          minLength: 1
     Ideas:
       allOf:
       - $ref: '#/components/schemas/AIGeneratedMeta'
@@ -1701,72 +1166,3 @@ components:
           type: integer
         redemptions:
           type: integer
-    Neighborhood:
-      type: object
-      required:
-      - id
-      - name
-      properties:
-        id:
-          type: string
-          pattern: ^nbh_[0-9]{3}$
-        name:
-          type: string
-    CourseCreate:
-      type: object
-      x-status: tbd
-      required:
-      - neighborhood_id
-      - business_ids
-      properties:
-        neighborhood_id:
-          type: string
-        business_ids:
-          type: array
-          minItems: 2
-          items:
-            type: string
-    CourseStop:
-      type: object
-      x-status: tbd
-      required:
-      - order
-      - business_id
-      properties:
-        order:
-          type: integer
-          minimum: 1
-        business_id:
-          type: string
-        benefit:
-          type: string
-    Course:
-      type: object
-      x-status: tbd
-      description: Course flow undecided; AI draft plus owner confirmation is only a proposal.
-      required:
-      - id
-      - slug
-      - neighborhood_id
-      - title
-      - stops
-      - status
-      properties:
-        id:
-          type: string
-        slug:
-          type: string
-        neighborhood_id:
-          type: string
-        title:
-          type: string
-        stops:
-          type: array
-          items:
-            $ref: '#/components/schemas/CourseStop'
-        status:
-          type: string
-          enum:
-          - DRAFT
-          - CONFIRMED
-          - PUBLISHED
