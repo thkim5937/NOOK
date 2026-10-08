@@ -342,9 +342,12 @@ paths:
             schema:
               $ref: '#/components/schemas/CollabRequestCreate'
             example:
-              recipient_business_id: biz_003
-              source: RECOMMENDATION
+              receiver_business_id: 3
+              source: ai_recommendation
               post_id: null
+              message: Shall we run a joint event?
+              collab_type: joint_event
+              desired_timing: next month
       responses:
         '201':
           description: Success.
@@ -360,9 +363,9 @@ paths:
               example:
                 data: &id005
                   id: req_001
-                  sender_business_id: biz_001
-                  recipient_business_id: biz_003
-                  source: RECOMMENDATION
+                  sender_business_id: 1
+                  receiver_business_id: 3
+                  source: ai_recommendation
                   status: PENDING
                   post_id: null
         '401':
@@ -426,7 +429,7 @@ paths:
     post:
       tags:
       - collab-requests
-      summary: Recipient accepts a request
+      summary: Receiver accepts a request
       operationId: post_v1_collab_requests_id_accept
       x-status: tbd
       parameters:
@@ -452,9 +455,9 @@ paths:
               example:
                 data:
                   id: req_001
-                  sender_business_id: biz_001
-                  recipient_business_id: biz_003
-                  source: RECOMMENDATION
+                  sender_business_id: 1
+                  receiver_business_id: 3
+                  source: ai_recommendation
                   status: ACCEPTED
                   post_id: null
         '401':
@@ -470,7 +473,7 @@ paths:
     post:
       tags:
       - collab-requests
-      summary: Recipient rejects a request
+      summary: Receiver rejects a request
       operationId: post_v1_collab_requests_id_reject
       x-status: draft
       parameters:
@@ -496,9 +499,9 @@ paths:
               example:
                 data:
                   id: req_001
-                  sender_business_id: biz_001
-                  recipient_business_id: biz_003
-                  source: RECOMMENDATION
+                  sender_business_id: 1
+                  receiver_business_id: 3
+                  source: ai_recommendation
                   status: REJECTED
                   post_id: null
         '401':
@@ -509,11 +512,57 @@ paths:
           $ref: '#/components/responses/InvalidState'
       security:
       - bearerAuth: []
+  /v1/collab-requests/{id}/cancel:
+    post:
+      tags:
+      - collab-requests
+      summary: Sender cancels a pending request
+      operationId: post_v1_collab_requests_id_cancel
+      x-status: draft
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: Collaboration request id
+        schema:
+          type: string
+        example: req_001
+      responses:
+        '200':
+          description: Success.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/CollabRequest'
+              example:
+                data:
+                  id: req_001
+                  sender_business_id: 1
+                  receiver_business_id: 3
+                  source: ai_recommendation
+                  status: CANCELLED
+                  post_id: null
+                  responded_at: '2026-10-08T09:00:00Z'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/InvalidState'
+      security:
+      - bearerAuth: []
   /v1/posts/{id}/love-call:
     post:
       tags:
       - collab-requests
-      summary: Respond to a love call (creates a request with source LOVE_CALL)
+      summary: Respond to a love call (creates a request with source collab_post)
       operationId: post_v1_posts_id_love_call
       x-status: draft
       parameters:
@@ -539,11 +588,11 @@ paths:
               example:
                 data:
                   id: req_001
-                  sender_business_id: biz_001
-                  recipient_business_id: biz_003
-                  source: LOVE_CALL
+                  sender_business_id: 1
+                  receiver_business_id: 3
+                  source: collab_post
                   status: PENDING
-                  post_id: post_001
+                  post_id: 1
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1113,6 +1162,17 @@ components:
               code: AUTH_REQUIRED
               message: Authentication required.
               details: []
+    Forbidden:
+      description: Authenticated but not allowed to perform this action.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error:
+              code: AUTH_FORBIDDEN
+              message: Not allowed.
+              details: []
     NotFound:
       description: Resource does not exist.
       content:
@@ -1211,16 +1271,22 @@ components:
       required:
       - id
       - sender_business_id
-      - recipient_business_id
+      - receiver_business_id
       - source
       - status
+      - post_id
+      - match_id
+      - message
+      - collab_type
+      - desired_timing
+      - responded_at
       properties:
         id:
           type: string
         sender_business_id:
-          type: string
-        recipient_business_id:
-          type: string
+          type: integer
+        receiver_business_id:
+          type: integer
         source:
           type: string
           enum:
@@ -1236,24 +1302,75 @@ components:
           - CANCELLED
         post_id:
           type:
+          - integer
+          - 'null'
+          description: Set when source is collab_post; null otherwise.
+        match_id:
+          type:
+          - integer
+          - 'null'
+        message:
+          type:
           - string
           - 'null'
-          description: Set when source is collab_post.
+        collab_type:
+          type:
+          - string
+          - 'null'
+          enum: &collab_type_enum
+          - limited_product
+          - popup
+          - joint_event
+          - sns_collab
+          - null
+          description: PROVISIONAL value list until the data teammate fixes the DB catalog.
+          x-provisional: true
+        desired_timing:
+          type:
+          - string
+          - 'null'
+        responded_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Null while the request is pending.
     CollabRequestCreate:
       type: object
+      description: The sender is the authenticated business (taken from the auth token), not a body field.
       required:
-      - recipient_business_id
+      - receiver_business_id
       - source
       properties:
-        recipient_business_id:
-          type: string
+        receiver_business_id:
+          type: integer
         source:
           type: string
           enum:
-          - RECOMMENDATION
-          - LOVE_CALL
-          - PROFILE
+          - ai_recommendation
+          - collab_post
+          - profile
         post_id:
+          type:
+          - integer
+          - 'null'
+          description: Required when source is collab_post; must be null otherwise.
+        match_id:
+          type:
+          - integer
+          - 'null'
+        message:
+          type:
+          - string
+          - 'null'
+        collab_type:
+          type:
+          - string
+          - 'null'
+          enum: *collab_type_enum
+          description: PROVISIONAL value list until the data teammate fixes the DB catalog.
+          x-provisional: true
+        desired_timing:
           type:
           - string
           - 'null'

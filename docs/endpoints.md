@@ -10,11 +10,12 @@ INTERNAL DRAFT - not agreed with FE/UI/Data teammates yet.
 | F1 | POST | /v1/me/consents | owner | Record consents | draft |
 | F2 | GET | /v1/recommendations | owner | AI-recommended collaboration candidates among registered shops | draft |
 | F2 | POST | /v1/recommendations/preferences | owner | Answer the AI's first-time question: what kind of shop to collaborate with | draft |
-| F3 | POST | /v1/collab-requests | owner | Send collaboration request; one flow for all entry paths via source (recommendation / love_call / profile); rate limits, opt-out, notification channel undecided | tbd |
+| F3 | POST | /v1/collab-requests | owner | Send collaboration request; one flow for all entry paths via source (ai_recommendation / collab_post / profile); rate limits, opt-out, notification channel undecided | tbd |
 | F3 | GET | /v1/collab-requests?box=sent\|received | owner | List sent or received requests | draft |
-| F3 | POST | /v1/collab-requests/{id}/accept | owner | Recipient accepts (when contact info is revealed undecided) | tbd |
-| F3 | POST | /v1/collab-requests/{id}/reject | owner | Recipient rejects | draft |
-| F3 | POST | /v1/posts/{id}/love-call | owner | Respond to a love call; creates a collab request with source=love_call | draft |
+| F3 | POST | /v1/collab-requests/{id}/accept | owner | Receiver accepts (when contact info is revealed undecided) | tbd |
+| F3 | POST | /v1/collab-requests/{id}/reject | owner | Receiver rejects | draft |
+| F3 | POST | /v1/collab-requests/{id}/cancel | owner | Sender cancels a pending request | draft |
+| F3 | POST | /v1/posts/{id}/love-call | owner | Respond to a love call; creates a collab request with source=collab_post | draft |
 | F4 | GET | /v1/posts | owner | List collaboration recruitment posts / love calls | draft |
 | F4 | POST | /v1/posts | owner | Create a recruitment post / love call | draft |
 | F5 | POST | /v1/me/marketing-links | owner | Link marketing data (e.g. Instagram); AI input only, never shown to other owners | tbd |
