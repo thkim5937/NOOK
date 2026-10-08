@@ -59,8 +59,8 @@ def test_collab_request_enums_match_domain():
     assert set(props["source"]["enum"]) == {s.value for s in RequestSource}
 
 
-def test_public_signup_login_have_empty_security():
-    open_paths = {"/v1/auth/signup", "/v1/auth/login"}
+def test_no_auth_paths_and_public_security_empty():
+    assert not any(path.startswith("/v1/auth") for path in SPEC["paths"])
     for (method, path), op in _operations().items():
-        if path.startswith("/v1/public") or path in open_paths:
+        if path.startswith("/v1/public"):
             assert op["security"] == [], (method, path)

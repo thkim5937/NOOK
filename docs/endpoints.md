@@ -2,9 +2,6 @@ INTERNAL DRAFT - not agreed with FE/UI/Data teammates yet.
 
 | Feature | Method | Path | Actor | Purpose | Status |
 |---|---|---|---|---|---|
-| F1 | POST | /v1/auth/signup | guest | Create shop owner account (login method undecided) | tbd |
-| F1 | POST | /v1/auth/login | guest | Log in, get tokens (login method undecided) | tbd |
-| F1 | POST | /v1/auth/refresh | owner | Refresh access token (login method undecided) | tbd |
 | F1 | POST | /v1/me/business/verification | owner | Verify business registration number (registry lookup vs document upload undecided) | tbd |
 | F1 | GET | /v1/me/business | owner | Read own shop profile | draft |
 | F1 | PUT | /v1/me/business | owner | Save shop profile: industry, main customer group, quiet hours, mood tags, intro, optional Instagram link | draft |
