@@ -248,6 +248,11 @@ paths:
                   source: ai_recommendation
                   status: PENDING
                   post_id: null
+                  match_id: null
+                  message: null
+                  collab_type: null
+                  desired_timing: null
+                  responded_at: null
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -340,6 +345,11 @@ paths:
                   source: ai_recommendation
                   status: ACCEPTED
                   post_id: null
+                  match_id: null
+                  message: null
+                  collab_type: null
+                  desired_timing: null
+                  responded_at: null
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -384,6 +394,11 @@ paths:
                   source: ai_recommendation
                   status: REJECTED
                   post_id: null
+                  match_id: null
+                  message: null
+                  collab_type: null
+                  desired_timing: null
+                  responded_at: null
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -427,6 +442,10 @@ paths:
                   source: ai_recommendation
                   status: CANCELLED
                   post_id: null
+                  match_id: null
+                  message: null
+                  collab_type: null
+                  desired_timing: null
                   responded_at: '2026-10-08T09:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
@@ -473,6 +492,11 @@ paths:
                   source: collab_post
                   status: PENDING
                   post_id: 1
+                  match_id: null
+                  message: null
+                  collab_type: null
+                  desired_timing: null
+                  responded_at: null
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
