@@ -33,6 +33,59 @@ tags:
 - name: tbd
   description: 'F7 coupons/measurements: scope undecided'
 paths:
+  /v1/businesses:
+    post:
+      tags:
+      - business-profile
+      summary: Register a business and verify it on the server
+      operationId: post_v1_businesses
+      x-status: draft
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BusinessRegistrationCreate'
+            example:
+              business_number: '0000000000'
+              business_name: Fictional Cafe
+              opening_date: '2024-03-01'
+              industry: cafe
+      responses:
+        '201':
+          description: Business row created by the server; verification_status is the lookup result.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/BusinessRegistered'
+              example:
+                data:
+                  id: 1
+                  verification_status: verified
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          $ref: '#/components/responses/InvalidState'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+      security:
+      - bearerAuth: []
+      description: 'Clients cannot insert business rows because the database rejects it (see docs/database.md);
+        the server inserts the row after a tax-authority lookup.
+
+
+        Result mapping: valid business number gives verification_status `verified`, invalid gives `rejected`,
+        lookup unavailable gives `pending` (assumption). The lookup uses the user''s registered legal
+        name (assumption). Each attempt counts toward a limit of 5 attempts per 10 minutes per user;
+        over the limit gives 429 RATE_LIMITED. A business_number that is already registered gives 409
+        REQUEST_INVALID_STATE. The app completes the rest of the profile afterwards directly in Supabase.'
   /v1/businesses/{business_id}/verification:
     post:
       tags:
@@ -73,9 +126,14 @@ paths:
           $ref: '#/components/responses/NotFound'
         '422':
           $ref: '#/components/responses/ValidationFailed'
+        '429':
+          $ref: '#/components/responses/RateLimited'
       security:
       - bearerAuth: []
-      description: Open decision, see docs/endpoints.md; shape is a placeholder.
+      description: Open decision, see docs/endpoints.md; shape is a placeholder. This is also the retry
+        path for businesses in `rejected` or `pending` state; retries count toward the same limit
+        as POST /v1/businesses (5 attempts per 10 minutes per user), and the 429 RATE_LIMITED response
+        applies.
   /v1/businesses/{business_id}/intro-draft:
     post:
       tags:
@@ -640,6 +698,17 @@ components:
               - field: body.intro
                 message: String should have at most 60 characters
                 type: string_too_long
+    RateLimited:
+      description: Too many verification attempts (5 per 10 minutes per user).
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error:
+              code: RATE_LIMITED
+              message: Too many verification attempts. Try again later.
+              details: []
   schemas:
     ErrorResponse:
       type: object
@@ -663,6 +732,7 @@ components:
               - REQUEST_VALIDATION_FAILED
               - INTERNAL_ERROR
               - HTTP_ERROR
+              - RATE_LIMITED
             message:
               type: string
             details:
@@ -927,6 +997,41 @@ components:
           - pending
           - verified
           - rejected
+    BusinessRegistrationCreate:
+      type: object
+      x-status: draft
+      description: Only these fields; the app completes the rest of the profile directly in Supabase.
+      required:
+      - business_number
+      - business_name
+      - opening_date
+      - industry
+      properties:
+        business_number:
+          type: string
+          pattern: ^[0-9]{10}$
+          description: Digits only, no hyphens (assumption).
+        business_name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        opening_date:
+          type: string
+          format: date
+        industry:
+          $ref: '#/components/schemas/BusinessProfile/properties/industry'
+    BusinessRegistered:
+      type: object
+      x-status: draft
+      required:
+      - id
+      - verification_status
+      properties:
+        id:
+          type: integer
+          minimum: 1
+        verification_status:
+          $ref: '#/components/schemas/Verification/properties/status'
     IntroDraftRequest:
       type: object
       description: Profile fields used as AI input.

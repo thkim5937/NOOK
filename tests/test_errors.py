@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from pydantic import BaseModel
 
-from app.core.errors import AppError, ErrorCode, register_exception_handlers
+from app.core.errors import STATUS, AppError, ErrorCode, register_exception_handlers
 
 
 class Item(BaseModel):
@@ -67,3 +67,7 @@ def test_unhandled_exception():
         "error": {"code": "INTERNAL_ERROR", "message": "Internal server error.", "details": []}
     }
     assert "secret-internal-detail" not in r.text
+
+
+def test_rate_limited_maps_to_429():
+    assert STATUS[ErrorCode.RATE_LIMITED] == 429

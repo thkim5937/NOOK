@@ -16,6 +16,7 @@ class ErrorCode(StrEnum):
     NOT_FOUND = "NOT_FOUND"
     REQUEST_INVALID_STATE = "REQUEST_INVALID_STATE"
     REQUEST_VALIDATION_FAILED = "REQUEST_VALIDATION_FAILED"
+    RATE_LIMITED = "RATE_LIMITED"
     INTERNAL_ERROR = "INTERNAL_ERROR"
     HTTP_ERROR = "HTTP_ERROR"  # other framework HTTP errors; keeps original status
 
@@ -27,6 +28,7 @@ STATUS: dict[ErrorCode, int] = {
     ErrorCode.NOT_FOUND: 404,
     ErrorCode.REQUEST_INVALID_STATE: 409,
     ErrorCode.REQUEST_VALIDATION_FAILED: 422,
+    ErrorCode.RATE_LIMITED: 429,
     ErrorCode.INTERNAL_ERROR: 500,
 }
 

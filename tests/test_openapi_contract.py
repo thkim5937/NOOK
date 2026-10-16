@@ -138,3 +138,57 @@ def test_status_and_source_enums_are_database_values():
     assert set(props["status"]["enum"]) == {"pending", "accepted", "rejected", "cancelled"}
     assert {s.value for s in RequestStatus} == set(props["status"]["enum"])
     assert set(props["source"]["enum"]) == {"ai_recommendation", "collab_post", "profile"}
+
+
+def _resolve(node):
+    while "$ref" in node:
+        target = SPEC
+        for part in node["$ref"].lstrip("#/").split("/"):
+            target = target[part]
+        node = target
+    return node
+
+
+def test_business_registration_operation_documents_responses():
+    op = _operations()[("POST", "/v1/businesses")]
+    assert op["security"]
+    assert {"201", "401", "409", "422", "429"} <= set(op["responses"])
+
+
+def test_business_registration_request_schema():
+    schema = SCHEMAS["BusinessRegistrationCreate"]
+    assert {"business_number", "business_name", "opening_date"} <= set(schema["required"])
+    assert set(schema["properties"]) == {
+        "business_number",
+        "business_name",
+        "opening_date",
+        "industry",
+    }
+    assert re.fullmatch(schema["properties"]["business_number"]["pattern"], "0123456789")
+    assert not re.fullmatch(schema["properties"]["business_number"]["pattern"], "012-34-56789")
+
+
+def test_business_registered_response_schema():
+    op = _operations()[("POST", "/v1/businesses")]
+    data = _resolve(op["responses"]["201"]["content"]["application/json"]["schema"])["properties"][
+        "data"
+    ]
+    registered = _resolve(data)
+    assert {"id", "verification_status"} <= set(registered["required"])
+    assert registered["properties"]["id"]["type"] == "integer"
+    status = _resolve(registered["properties"]["verification_status"])
+    assert set(status["enum"]) == {"pending", "verified", "rejected"}
+
+
+def test_rate_limited_code_and_operations():
+    enum = SCHEMAS["ErrorResponse"]["properties"]["error"]["properties"]["code"]["enum"]
+    assert "RATE_LIMITED" in enum
+    refs = {
+        key
+        for key, op in _operations().items()
+        if op["responses"].get("429", {}).get("$ref", "").endswith("/RateLimited")
+    }
+    assert refs == {
+        ("POST", "/v1/businesses"),
+        ("POST", "/v1/businesses/{business_id}/verification"),
+    }

@@ -2,6 +2,7 @@ INTERNAL DRAFT - not agreed with FE/UI/Data teammates yet.
 
 | Feature | Method | Path | Actor | Purpose | Status |
 |---|---|---|---|---|---|
+| F1 | POST | /v1/businesses | owner | Register a business; server-side verification; clients cannot insert business rows | draft |
 | F1 | POST | /v1/businesses/{business_id}/verification | owner | Verify business registration number (registry lookup vs document upload undecided) | tbd |
 | F1 | POST | /v1/businesses/{business_id}/intro-draft | owner | AI-generated one-line intro draft for the owner to edit | draft |
 | F1 | POST | /v1/me/consents | owner | Record consents | draft |
@@ -37,6 +38,25 @@ Removed from the backend contract (2026-10-08)
 - POST /v1/posts/{id}/love-call - the love call is the create-request operation (POST /v1/collab-requests) with source=collab_post and a post_id.
 - POST /v1/me/marketing-links - Instagram link. instagram_url is a column of the business profile, so the app writes it directly through Supabase.
 - DELETE /v1/me/marketing-links/{id} - unlink Instagram; same reason (clear the instagram_url column).
+
+## Business registration
+
+POST /v1/businesses registers a business. The server does it because the database blocks client inserts into business_profiles and client writes to the verification fields (trigger nook_business_verification_guard, see docs/database.md).
+
+Flow:
+1. The app sends business_number, business_name, opening_date and industry (the app completes the rest of the profile afterwards directly in Supabase).
+2. The server calls the database function nook_consume_verification_attempt, which enforces the limit of 5 attempts per 10 minutes per user. Over the limit: 429 RATE_LIMITED.
+3. The server looks the number up with the tax authority, inserts the row and returns 201 with id and verification_status.
+
+Result mapping (assumption): valid number gives `verified`, invalid gives `rejected`, lookup unavailable gives `pending`.
+
+Other points:
+- The business number is digits only, 10 characters, no hyphens (assumption).
+- The lookup uses the user's registered legal name (assumption). The external lookup request fields are unverified: verify them against the official API documentation before implementation.
+- A business_number that is already registered gives 409 REQUEST_INVALID_STATE. Trade-off: a rejected row keeps its number reserved, because business_number is unique.
+- Businesses in `pending` or `rejected` state retry through POST /v1/businesses/{business_id}/verification; retries count toward the same limit.
+
+Error code RATE_LIMITED (HTTP 429) is new: too many verification attempts.
 
 ## Acting business
 
