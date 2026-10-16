@@ -9,7 +9,7 @@ info:
 
 
     Derived from docs/endpoints.md. Operations marked `x-status: tbd` have open decisions (login method,
-    marketing links, coupon scope) and their shapes are placeholders. No endpoint is implemented
+    coupon scope) and their shapes are placeholders. No endpoint is implemented
     yet.
 
 
@@ -31,7 +31,7 @@ tags:
 - name: ideas
   description: F6 AI collaboration ideas
 - name: tbd
-  description: 'F5 marketing links and F7 coupons/measurements: scope undecided'
+  description: 'F7 coupons/measurements: scope undecided'
 paths:
   /v1/businesses/{business_id}/verification:
     post:
@@ -64,7 +64,7 @@ paths:
                     $ref: '#/components/schemas/Verification'
               example:
                 data:
-                  status: PENDING
+                  status: pending
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -165,6 +165,7 @@ paths:
       operationId: get_v1_recommendations
       x-status: draft
       parameters:
+      - $ref: '#/components/parameters/BusinessIdQuery'
       - $ref: '#/components/parameters/Limit'
       - $ref: '#/components/parameters/Cursor'
       responses:
@@ -189,7 +190,8 @@ paths:
                     description: Pass as `cursor` for the next page; null on the last page. DRAFT convention.
               example:
                 data:
-                - business:
+                - match_id: 7
+                  business:
                     id: 3
                     name: 밀밭제빵소
                     neighborhood_id: nbh_001
@@ -204,6 +206,8 @@ paths:
                 next_cursor: null
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
       security:
       - bearerAuth: []
       description: Response includes AI disclosure fields (`ai_generated`, `disclosure`); the client must
@@ -222,6 +226,7 @@ paths:
             schema:
               $ref: '#/components/schemas/CollabRequestCreate'
             example:
+              sender_business_id: 1
               receiver_business_id: 3
               source: ai_recommendation
               post_id: null
@@ -241,12 +246,12 @@ paths:
                   data:
                     $ref: '#/components/schemas/CollabRequest'
               example:
-                data: &id005
-                  id: req_001
+                data:
+                  id: 1
                   sender_business_id: 1
                   receiver_business_id: 3
                   source: ai_recommendation
-                  status: PENDING
+                  status: pending
                   post_id: null
                   match_id: null
                   message: null
@@ -255,6 +260,8 @@ paths:
                   responded_at: null
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
         '422':
@@ -262,54 +269,6 @@ paths:
       security:
       - bearerAuth: []
       description: Open decision, see docs/endpoints.md; shape is a placeholder.
-    get:
-      tags:
-      - collab-requests
-      summary: List sent or received requests
-      operationId: get_v1_collab_requests
-      x-status: draft
-      parameters:
-      - name: box
-        in: query
-        required: true
-        schema:
-          type: string
-          enum:
-          - sent
-          - received
-        description: Which box to list.
-      - $ref: '#/components/parameters/Limit'
-      - $ref: '#/components/parameters/Cursor'
-      responses:
-        '200':
-          description: Success.
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                - data
-                - next_cursor
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/CollabRequest'
-                  next_cursor:
-                    type:
-                    - string
-                    - 'null'
-                    description: Pass as `cursor` for the next page; null on the last page. DRAFT convention.
-              example:
-                data:
-                - *id005
-                next_cursor: null
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '422':
-          $ref: '#/components/responses/ValidationFailed'
-      security:
-      - bearerAuth: []
   /v1/collab-requests/{id}/accept:
     post:
       tags:
@@ -323,8 +282,9 @@ paths:
         required: true
         description: Collaboration request id
         schema:
-          type: string
-        example: req_001
+          type: integer
+          minimum: 1
+        example: 1
       responses:
         '200':
           description: Success.
@@ -339,11 +299,11 @@ paths:
                     $ref: '#/components/schemas/CollabRequest'
               example:
                 data:
-                  id: req_001
+                  id: 1
                   sender_business_id: 1
                   receiver_business_id: 3
                   source: ai_recommendation
-                  status: ACCEPTED
+                  status: accepted
                   post_id: null
                   match_id: null
                   message: null
@@ -372,8 +332,9 @@ paths:
         required: true
         description: Collaboration request id
         schema:
-          type: string
-        example: req_001
+          type: integer
+          minimum: 1
+        example: 1
       responses:
         '200':
           description: Success.
@@ -388,11 +349,11 @@ paths:
                     $ref: '#/components/schemas/CollabRequest'
               example:
                 data:
-                  id: req_001
+                  id: 1
                   sender_business_id: 1
                   receiver_business_id: 3
                   source: ai_recommendation
-                  status: REJECTED
+                  status: rejected
                   post_id: null
                   match_id: null
                   message: null
@@ -420,8 +381,9 @@ paths:
         required: true
         description: Collaboration request id
         schema:
-          type: string
-        example: req_001
+          type: integer
+          minimum: 1
+        example: 1
       responses:
         '200':
           description: Success.
@@ -436,11 +398,11 @@ paths:
                     $ref: '#/components/schemas/CollabRequest'
               example:
                 data:
-                  id: req_001
+                  id: 1
                   sender_business_id: 1
                   receiver_business_id: 3
                   source: ai_recommendation
-                  status: CANCELLED
+                  status: cancelled
                   post_id: null
                   match_id: null
                   message: null
@@ -457,119 +419,6 @@ paths:
           $ref: '#/components/responses/InvalidState'
       security:
       - bearerAuth: []
-  /v1/posts/{id}/love-call:
-    post:
-      tags:
-      - collab-requests
-      summary: Respond to a love call (creates a request with source collab_post)
-      operationId: post_v1_posts_id_love_call
-      x-status: draft
-      parameters:
-      - name: id
-        in: path
-        required: true
-        description: Post id
-        schema:
-          type: string
-        example: post_001
-      responses:
-        '201':
-          description: Success.
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                - data
-                properties:
-                  data:
-                    $ref: '#/components/schemas/CollabRequest'
-              example:
-                data:
-                  id: req_001
-                  sender_business_id: 1
-                  receiver_business_id: 3
-                  source: collab_post
-                  status: PENDING
-                  post_id: 1
-                  match_id: null
-                  message: null
-                  collab_type: null
-                  desired_timing: null
-                  responded_at: null
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '409':
-          $ref: '#/components/responses/InvalidState'
-      security:
-      - bearerAuth: []
-  /v1/me/marketing-links:
-    post:
-      tags:
-      - tbd
-      summary: Link marketing data (AI input only, never shown to other owners)
-      operationId: post_v1_me_marketing_links
-      x-status: tbd
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/MarketingLinkCreate'
-            example:
-              kind: INSTAGRAM
-              url: https://instagram.example.test/moonlight_dabang
-      responses:
-        '201':
-          description: Success.
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                - data
-                properties:
-                  data:
-                    $ref: '#/components/schemas/MarketingLink'
-              example:
-                data:
-                  id: mkl_001
-                  kind: INSTAGRAM
-                  url: https://instagram.example.test/moonlight_dabang
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '422':
-          $ref: '#/components/responses/ValidationFailed'
-      security:
-      - bearerAuth: []
-      description: Open decision, see docs/endpoints.md; shape is a placeholder.
-  /v1/me/marketing-links/{id}:
-    delete:
-      tags:
-      - tbd
-      summary: Unlink marketing data
-      operationId: delete_v1_me_marketing_links_id
-      x-status: tbd
-      parameters:
-      - name: id
-        in: path
-        required: true
-        description: Marketing link id
-        schema:
-          type: string
-        example: mkl_001
-      responses:
-        '204':
-          description: Success, no body.
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-      security:
-      - bearerAuth: []
-      description: Open decision, see docs/endpoints.md; shape is a placeholder.
   /v1/collab-requests/{id}/ideas:
     post:
       tags:
@@ -583,8 +432,9 @@ paths:
         required: true
         description: Collaboration request id
         schema:
-          type: string
-        example: req_001
+          type: integer
+          minimum: 1
+        example: 1
       responses:
         '200':
           description: Success.
@@ -655,6 +505,7 @@ paths:
       operationId: get_v1_me_measurements
       x-status: tbd
       parameters:
+      - $ref: '#/components/parameters/BusinessIdQuery'
       - $ref: '#/components/parameters/Limit'
       - $ref: '#/components/parameters/Cursor'
       responses:
@@ -685,6 +536,8 @@ paths:
                 next_cursor: null
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
       security:
       - bearerAuth: []
       description: Open decision, see docs/endpoints.md; shape is a placeholder.
@@ -702,6 +555,15 @@ components:
       description: Business id; the caller must own it (one account can own several businesses).
       schema:
         type: integer
+    BusinessIdQuery:
+      name: business_id
+      in: query
+      required: true
+      description: The business the caller acts as; one account can own several businesses. The server
+        verifies ownership and answers 403 AUTH_FORBIDDEN otherwise.
+      schema:
+        type: integer
+        minimum: 1
     Limit:
       name: limit
       in: query
@@ -851,7 +713,8 @@ components:
       - responded_at
       properties:
         id:
-          type: string
+          type: integer
+          minimum: 1
         sender_business_id:
           type: integer
         receiver_business_id:
@@ -865,10 +728,10 @@ components:
         status:
           type: string
           enum:
-          - PENDING
-          - ACCEPTED
-          - REJECTED
-          - CANCELLED
+          - pending
+          - accepted
+          - rejected
+          - cancelled
         post_id:
           type:
           - integer
@@ -906,11 +769,16 @@ components:
           description: Null while the request is pending.
     CollabRequestCreate:
       type: object
-      description: The sender is the authenticated business (taken from the auth token), not a body field.
       required:
+      - sender_business_id
       - receiver_business_id
       - source
       properties:
+        sender_business_id:
+          type: integer
+          minimum: 1
+          description: The business the caller acts as; the server must verify that the caller owns it
+            and answer 403 AUTH_FORBIDDEN otherwise.
         receiver_business_id:
           type: integer
         source:
@@ -1056,9 +924,9 @@ components:
         status:
           type: string
           enum:
-          - PENDING
-          - VERIFIED
-          - REJECTED
+          - pending
+          - verified
+          - rejected
     IntroDraftRequest:
       type: object
       description: Profile fields used as AI input.
@@ -1104,9 +972,15 @@ components:
       - $ref: '#/components/schemas/AIGeneratedMeta'
       - type: object
         required:
+        - match_id
         - business
         - reason
         properties:
+          match_id:
+            type: integer
+            minimum: 1
+            description: The id of the stored recommendation (collab_matches row) that the client passes
+              as match_id when it creates a request with source ai_recommendation.
           business:
             allOf:
             - type: object
@@ -1142,36 +1016,6 @@ components:
                   type: string
           promo_text:
             type: string
-    MarketingLinkCreate:
-      type: object
-      x-status: tbd
-      required:
-      - kind
-      - url
-      properties:
-        kind:
-          type: string
-          enum:
-          - INSTAGRAM
-        url:
-          type: string
-          format: uri
-    MarketingLink:
-      type: object
-      x-status: tbd
-      description: AI input only, never shown to other owners.
-      required:
-      - id
-      - kind
-      - url
-      properties:
-        id:
-          type: string
-        kind:
-          type: string
-        url:
-          type: string
-          format: uri
     CouponScanResult:
       type: object
       x-status: tbd

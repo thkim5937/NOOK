@@ -26,10 +26,10 @@ class InvalidRequest(DomainError):
 
 
 class RequestStatus(StrEnum):
-    PENDING = "PENDING"
-    ACCEPTED = "ACCEPTED"
-    REJECTED = "REJECTED"
-    CANCELLED = "CANCELLED"
+    PENDING = "pending"
+    ACCEPTED = "accepted"
+    REJECTED = "rejected"
+    CANCELLED = "cancelled"
 
 
 class RequestSource(StrEnum):

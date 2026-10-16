@@ -95,3 +95,46 @@ def test_business_scoped_paths_declare_business_id():
             assert match, (method, path)
             assert match[0]["in"] == "path" and match[0]["required"] is True, (method, path)
             assert match[0]["schema"]["type"] == "integer", (method, path)
+
+
+def _params(item, op):
+    components = SPEC["components"]["parameters"]
+    return [
+        components[p["$ref"].rsplit("/", 1)[1]] if "$ref" in p else p
+        for p in item.get("parameters", []) + op.get("parameters", [])
+    ]
+
+
+def test_path_id_parameters_are_integers():
+    for path, item in SPEC["paths"].items():
+        for method, op in item.items():
+            if method in HTTP_METHODS:
+                for p in _params(item, op):
+                    if p["in"] == "path" and p["name"] == "id":
+                        assert p["schema"]["type"] == "integer", (method, path)
+
+
+def test_create_requires_sender_business_id():
+    assert "sender_business_id" in SCHEMAS["CollabRequestCreate"]["required"]
+
+
+def test_business_id_query_only_on_recommendations_and_measurements():
+    refs = {
+        key
+        for key, op in _operations().items()
+        if any(p.get("$ref", "").endswith("/BusinessIdQuery") for p in op.get("parameters", []))
+    }
+    assert refs == {("GET", "/v1/recommendations"), ("GET", "/v1/me/measurements")}
+    for key in refs:
+        assert "403" in _operations()[key]["responses"], key
+
+
+def test_recommendation_requires_match_id():
+    assert any("match_id" in part.get("required", []) for part in SCHEMAS["Recommendation"]["allOf"])
+
+
+def test_status_and_source_enums_are_database_values():
+    props = SCHEMAS["CollabRequest"]["properties"]
+    assert set(props["status"]["enum"]) == {"pending", "accepted", "rejected", "cancelled"}
+    assert {s.value for s in RequestStatus} == set(props["status"]["enum"])
+    assert set(props["source"]["enum"]) == {"ai_recommendation", "collab_post", "profile"}

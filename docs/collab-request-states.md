@@ -35,22 +35,22 @@ The domain never reads the clock; callers pass a timezone-aware `now`.
 
 ```
             accept (receiver)
-        +--------------------> ACCEPTED
+        +--------------------> accepted
         |  reject (receiver)
-PENDING +--------------------> REJECTED
+pending +--------------------> rejected
         |  cancel (sender)
-        +--------------------> CANCELLED
+        +--------------------> cancelled
 ```
 
 | From | To | Triggered by |
 |---|---|---|
-| (new) | `PENDING` | Sender (`sender_business_id` must differ from `receiver_business_id`) |
-| `PENDING` | `ACCEPTED` | Receiver only |
-| `PENDING` | `REJECTED` | Receiver only |
-| `PENDING` | `CANCELLED` | Sender only |
-| `ACCEPTED` | - | Final |
-| `REJECTED` | - | Final |
-| `CANCELLED` | - | Final |
+| (new) | `pending` | Sender (`sender_business_id` must differ from `receiver_business_id`) |
+| `pending` | `accepted` | Receiver only |
+| `pending` | `rejected` | Receiver only |
+| `pending` | `cancelled` | Sender only |
+| `accepted` | - | Final |
+| `rejected` | - | Final |
+| `cancelled` | - | Final |
 
 Wrong actor raises `NotRecipient` (accept/reject) or `NotSender` (cancel); a disallowed
 current status raises `InvalidStateTransition`.
