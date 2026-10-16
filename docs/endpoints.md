@@ -32,7 +32,7 @@ Removed from the backend contract (2026-10-08)
 - GET /v1/public/courses/{slug} - F8 course detail
 - POST /v1/recommendations/preferences - recommendation preferences (no screen or storage)
 
-(c) Removed from the backend contract (this change); each can be restored from git history using the old method and path:
+(c) Removed from the backend contract (2026-10-16); each can be restored from git history using the old method and path:
 - GET /v1/collab-requests?box=sent|received - list of collaboration requests. The app reads them directly through Supabase because the row-level security rules let participating owners read their own requests.
 - POST /v1/posts/{id}/love-call - the love call is the create-request operation (POST /v1/collab-requests) with source=collab_post and a post_id.
 - POST /v1/me/marketing-links - Instagram link. instagram_url is a column of the business profile, so the app writes it directly through Supabase.
@@ -47,4 +47,8 @@ One account can own several businesses, so the client says which business it act
 - Verification and intro-draft: `business_id` path parameter.
 - If the caller does not own the given business, the server answers 403 AUTH_FORBIDDEN.
 
+## Path renames
+
 Path renames (business-scoped, one account can own several businesses): POST /v1/me/business/verification is now POST /v1/businesses/{business_id}/verification; POST /v1/me/business/intro-draft is now POST /v1/businesses/{business_id}/intro-draft.
+
+Verified database facts: see docs/database.md.
