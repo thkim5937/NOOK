@@ -31,7 +31,8 @@ class JwksKeyProvider:
     def get_signing_key(self, token: str) -> Any:
         try:
             return self._client.get_signing_key_from_jwt(token).key
-        except jwt.PyJWTError:  # PyJWKClientError, PyJWKError, DecodeError
+        except (jwt.PyJWTError, OSError, ValueError):
+            # PyJWT errors, plus fetch failures it does not wrap (e.g. connection reset, bad JSON).
             raise TokenError(_GENERIC_MESSAGE) from None
 
 

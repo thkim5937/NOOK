@@ -52,3 +52,33 @@ to force it sooner, restart the process.
 
 - Supabase documentation: JWTs and the JWT claims reference.
 - PyJWT documentation: `jwt.decode`, `PyJWKClient`, `PyJWK`.
+
+## Request flow
+
+1. The client sends `Authorization: Bearer <access token>`.
+2. `extract_credentials` (`app/api/deps.py`) is the only code that reads the header. It checks the
+   scheme case-insensitively and passes the bare token on, or `None` when the header is missing,
+   has another scheme, or has no token.
+3. `get_authenticator` picks the implementation from settings: `SupabaseAuthenticator` when the
+   JWKS URL and issuer are both available (i.e. `SUPABASE_URL` is set), otherwise
+   `NotConfiguredAuthenticator`, which denies everything. The Supabase authenticator is built once
+   per process so the JWKS key cache survives across requests.
+4. `SupabaseAuthenticator` rejects `None`, empty or whitespace-containing tokens, then calls
+   `SupabaseJwtVerifier.verify`. Any `TokenError` becomes `AuthenticationFailed` with a generic
+   message that never contains the token.
+5. `current_owner` turns `AuthenticationFailed` into HTTP 401 with code `AUTH_REQUIRED` in the
+   standard `{"error": {...}}` envelope.
+
+`business_id` on the returned `AuthenticatedOwner` is intentionally `None`: a user may own several
+businesses, so ownership of a given business is checked later in the service layer.
+
+A JWKS outage (fetch error) surfaces as `TokenError` and therefore as 401 (assumption). Clients
+cannot tell it apart from a bad token.
+
+## Current contract state
+
+At the time of writing, `api/openapi.yaml` already declares `components.securitySchemes.bearerAuth`
+(`type: http`, `scheme: bearer`) and lists `bearerAuth` as `security` on the protected operations.
+No current route in `app/` uses `current_owner` yet, so the flow above is covered by tests with a
+test-only route. Adding bearer security to the remaining operations that lack it, and replacing the
+"login method undecided" description, is a contract change (proposal, needs team agreement).

@@ -148,3 +148,13 @@ def test_error_message_never_contains_token(verifier, private_key):
         verifier.verify(token)
     assert token not in str(info.value)
     assert token not in repr(info.value)
+
+
+def test_token_missing_iss_rejected(verifier, private_key):
+    with pytest.raises(TokenError):
+        verifier.verify(make_token(private_key, drop=("iss",)))
+
+
+def test_token_missing_aud_rejected(verifier, private_key):
+    with pytest.raises(TokenError):
+        verifier.verify(make_token(private_key, drop=("aud",)))
