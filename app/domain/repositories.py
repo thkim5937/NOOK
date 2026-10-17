@@ -31,3 +31,13 @@ class CollabRequestRepository(Protocol):
     def list_received(self, business_id: int) -> list[CollabRequest]:
         """Requests received by business_id, in insertion order."""
         ...
+
+    def get_pending_between(
+        self, business_a_id: int, business_b_id: int
+    ) -> CollabRequest | None:
+        """The pending request between the two businesses in either direction, or None."""
+        ...
+
+
+class BusinessOwnership(Protocol):
+    def owns(self, owner_id: str, business_id: int) -> bool: ...

@@ -1,4 +1,4 @@
-from app.domain.collab_request import CollabRequest
+from app.domain.collab_request import CollabRequest, RequestStatus
 from app.domain.repositories import AlreadyExists, NotFoundInRepository
 
 
@@ -24,3 +24,15 @@ class InMemoryCollabRequestRepository:
 
     def list_received(self, business_id: int) -> list[CollabRequest]:
         return [r for r in self._items.values() if r.receiver_business_id == business_id]
+
+    def get_pending_between(
+        self, business_a_id: int, business_b_id: int
+    ) -> CollabRequest | None:
+        pair = {business_a_id, business_b_id}
+        for r in self._items.values():
+            if r.status == RequestStatus.PENDING and {
+                r.sender_business_id,
+                r.receiver_business_id,
+            } == pair:
+                return r
+        return None

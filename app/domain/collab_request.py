@@ -25,6 +25,14 @@ class InvalidRequest(DomainError):
     pass
 
 
+class Forbidden(DomainError):
+    """The caller does not own the business they act for."""
+
+
+class DuplicatePendingRequest(DomainError):
+    """A pending request already exists between the two businesses."""
+
+
 class RequestStatus(StrEnum):
     PENDING = "pending"
     ACCEPTED = "accepted"

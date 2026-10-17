@@ -88,3 +88,23 @@ def test_get_by_integer_id_returns_stored_request(repo):
     repo.add(r)
     assert repo.get(42) == r
     assert repo.get(43) is None
+
+
+def test_get_pending_between_finds_both_directions(repo):
+    r = req(1, 1, 2)
+    repo.add(r)
+    assert repo.get_pending_between(1, 2) == r
+    assert repo.get_pending_between(2, 1) == r
+
+
+def test_get_pending_between_ignores_non_pending(repo):
+    r = req(1, 1, 2)
+    repo.add(r)
+    repo.update(accept(r, 2, datetime(2026, 1, 1, tzinfo=UTC)))
+    assert repo.get_pending_between(1, 2) is None
+
+
+def test_get_pending_between_none_when_absent_or_other_pair(repo):
+    assert repo.get_pending_between(1, 2) is None
+    repo.add(req(1, 1, 3))
+    assert repo.get_pending_between(1, 2) is None

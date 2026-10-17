@@ -164,3 +164,43 @@ Two rows.
 ```sql
 alter table public.collab_requests drop column collab_type, drop column desired_timing;
 ```
+
+## P5 one pending request per pair of businesses (backs the duplicate check)
+
+### Evidence
+
+collab_requests has no unique constraint on business pairs (see docs/database.md). The backend duplicate check (docs/collab-request-states.md, Service rules) is not atomic, so two concurrent creates can both pass it.
+
+### Risk
+
+Existing duplicate pending rows would make the index creation fail, and must be found and resolved first. Read-only check:
+
+```sql
+select least(sender_business_id, receiver_business_id) as a, greatest(sender_business_id, receiver_business_id) as b, count(*) from public.collab_requests where status = 'pending' group by 1, 2 having count(*) > 1;
+```
+
+No rows means it is safe. After the index exists, a losing concurrent insert fails with a unique violation, which the backend must map to REQUEST_INVALID_STATE (409).
+
+### Proposal
+
+```sql
+create unique index collab_requests_one_pending_per_pair on public.collab_requests (least(sender_business_id, receiver_business_id), greatest(sender_business_id, receiver_business_id)) where status = 'pending';
+```
+
+### Impact on the app
+
+A second pending request between the same two businesses (either direction) is rejected by the database. Rows in other statuses are not affected.
+
+### How to verify afterwards (read-only queries)
+
+```sql
+select indexname, indexdef from pg_indexes where tablename = 'collab_requests' and indexname = 'collab_requests_one_pending_per_pair';
+```
+
+One row.
+
+### Rollback
+
+```sql
+drop index public.collab_requests_one_pending_per_pair;
+```
