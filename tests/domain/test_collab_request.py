@@ -22,7 +22,7 @@ SENDER, RECEIVER = 1, 2
 
 
 def make(source=RequestSource.PROFILE, **kw):
-    return create_request("r1", SENDER, RECEIVER, source, **kw)
+    return create_request(1, SENDER, RECEIVER, source, **kw)
 
 
 def make_for(source):
@@ -134,7 +134,7 @@ def test_non_receiver_rejected(action, actor):
 
 def test_cannot_request_self():
     with pytest.raises(InvalidRequest):
-        create_request("r1", 1, 1, RequestSource.PROFILE)
+        create_request(1, 1, 1, RequestSource.PROFILE)
 
 
 def test_original_unchanged():
@@ -144,3 +144,9 @@ def test_original_unchanged():
     cancel(r, SENDER, NOW)
     assert r.status == RequestStatus.PENDING
     assert r.responded_at is None
+
+
+@pytest.mark.parametrize("bad_id", [0, -1, "1", True, 1.0, None])
+def test_invalid_id_rejected(bad_id):
+    with pytest.raises(InvalidRequest):
+        create_request(bad_id, SENDER, RECEIVER, RequestSource.PROFILE)

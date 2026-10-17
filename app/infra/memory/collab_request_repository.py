@@ -4,14 +4,14 @@ from app.domain.repositories import AlreadyExists, NotFoundInRepository
 
 class InMemoryCollabRequestRepository:
     def __init__(self) -> None:
-        self._items: dict[str, CollabRequest] = {}  # dict keeps insertion order
+        self._items: dict[int, CollabRequest] = {}  # dict keeps insertion order
 
     def add(self, request: CollabRequest) -> None:
         if request.id in self._items:
             raise AlreadyExists(request.id)
         self._items[request.id] = request
 
-    def get(self, request_id: str) -> CollabRequest | None:
+    def get(self, request_id: int) -> CollabRequest | None:
         return self._items.get(request_id)
 
     def update(self, request: CollabRequest) -> None:

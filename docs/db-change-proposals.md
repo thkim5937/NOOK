@@ -128,3 +128,39 @@ No rows.
 ```sql
 grant truncate on all tables in schema public to anon, authenticated;
 ```
+
+## P4 collab_type and desired_timing columns (feature request)
+
+### Evidence
+
+The contract and the domain carry collab_type (values limited_product, popup, joint_event, sns_collab; the value list is provisional) and desired_timing. The table public.collab_requests has neither column (see docs/database.md).
+
+### Risk
+
+Without the columns the server cannot store these inputs; they would be dropped.
+
+### Proposal
+
+```sql
+alter table public.collab_requests add column collab_type varchar, add column desired_timing varchar;
+```
+
+Both columns are nullable. There is no CHECK constraint yet because the collab_type values are provisional; add one once the values are final.
+
+### Impact on the app
+
+No effect on existing rows; the contract fields stay optional.
+
+### How to verify afterwards (read-only queries)
+
+```sql
+select column_name, data_type from information_schema.columns where table_schema = 'public' and table_name = 'collab_requests' and column_name in ('collab_type', 'desired_timing');
+```
+
+Two rows.
+
+### Rollback
+
+```sql
+alter table public.collab_requests drop column collab_type, drop column desired_timing;
+```

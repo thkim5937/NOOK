@@ -24,50 +24,50 @@ def req(id, sender=1, receiver=2, source=RequestSource.PROFILE, post_id=None):
 
 
 def test_add_then_get(repo):
-    r = req("r1")
+    r = req(1)
     repo.add(r)
-    assert repo.get("r1") == r
+    assert repo.get(1) == r
 
 
 def test_get_unknown_returns_none(repo):
-    assert repo.get("nope") is None
+    assert repo.get(999) is None
 
 
 def test_add_duplicate_id_raises(repo):
-    repo.add(req("r1"))
+    repo.add(req(1))
     with pytest.raises(AlreadyExists):
-        repo.add(req("r1", sender=3))
+        repo.add(req(1, sender=3))
 
 
 def test_update_replaces_stored_request(repo):
-    r = req("r1")
+    r = req(1)
     repo.add(r)
     accepted = accept(r, 2, datetime(2026, 1, 1, tzinfo=UTC))
     repo.update(accepted)
-    assert repo.get("r1") == accepted
-    assert repo.get("r1").status == RequestStatus.ACCEPTED
+    assert repo.get(1) == accepted
+    assert repo.get(1).status == RequestStatus.ACCEPTED
 
 
 def test_update_persists_cancelled_with_responded_at(repo):
-    r = req("r1")
+    r = req(1)
     repo.add(r)
     now = datetime(2026, 1, 1, tzinfo=UTC)
     repo.update(cancel(r, 1, now))
-    stored = repo.get("r1")
+    stored = repo.get(1)
     assert stored.status == RequestStatus.CANCELLED
     assert stored.responded_at == now
 
 
 def test_update_unknown_raises(repo):
     with pytest.raises(NotFoundInRepository):
-        repo.update(req("ghost"))
+        repo.update(req(999))
 
 
 def test_list_sent_and_received_filter_in_insertion_order(repo):
-    a_to_b = req("r1", 1, 2)
-    c_to_a = req("r2", 3, 1)
-    a_to_c = req("r3", 1, 3)
-    b_to_c = req("r4", 2, 3)
+    a_to_b = req(1, 1, 2)
+    c_to_a = req(2, 3, 1)
+    a_to_c = req(3, 1, 3)
+    b_to_c = req(4, 2, 3)
     for r in (a_to_b, c_to_a, a_to_c, b_to_c):
         repo.add(r)
     assert repo.list_sent(1) == [a_to_b, a_to_c]
@@ -78,6 +78,13 @@ def test_list_sent_and_received_filter_in_insertion_order(repo):
 
 @pytest.mark.parametrize("source", list(RequestSource))
 def test_all_sources_round_trip(repo, source):
-    r = req("r1", source=source, post_id=10 if source == RequestSource.COLLAB_POST else None)
+    r = req(1, source=source, post_id=10 if source == RequestSource.COLLAB_POST else None)
     repo.add(r)
-    assert repo.get("r1") == r
+    assert repo.get(1) == r
+
+
+def test_get_by_integer_id_returns_stored_request(repo):
+    r = req(42)
+    repo.add(r)
+    assert repo.get(42) == r
+    assert repo.get(43) is None

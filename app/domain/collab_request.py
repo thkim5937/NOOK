@@ -59,7 +59,7 @@ ALLOWED_TRANSITIONS: dict[RequestStatus, frozenset[RequestStatus]] = {
 
 @dataclass(frozen=True)
 class CollabRequest:
-    id: str
+    id: int
     sender_business_id: int
     receiver_business_id: int
     source: RequestSource
@@ -73,7 +73,7 @@ class CollabRequest:
 
 
 def create_request(
-    id: str,
+    id: int,
     sender_business_id: int,
     receiver_business_id: int,
     source: RequestSource,
@@ -83,6 +83,8 @@ def create_request(
     collab_type: CollabType | None = None,
     desired_timing: str | None = None,
 ) -> CollabRequest:
+    if isinstance(id, bool) or not isinstance(id, int) or id <= 0:
+        raise InvalidRequest("id must be a positive integer")
     if sender_business_id == receiver_business_id:
         raise InvalidRequest("A business cannot send a request to itself")
     if source == RequestSource.COLLAB_POST and post_id is None:

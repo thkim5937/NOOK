@@ -17,7 +17,7 @@ All entry paths create the same request object; only `source` differs.
 ## Fields
 | Field | Type | Notes |
 |---|---|---|
-| `id` | str | |
+| `id` | int | positive integer (database bigint) |
 | `sender_business_id` | int | must differ from `receiver_business_id` |
 | `receiver_business_id` | int | |
 | `source` | enum | see above |
@@ -28,6 +28,8 @@ All entry paths create the same request object; only `source` differs.
 | `collab_type` | enum \| None | **PROVISIONAL** - values (`limited_product`, `popup`, `joint_event`, `sns_collab`) are not final until the data teammate fixes the DB catalog |
 | `desired_timing` | str \| None | |
 | `responded_at` | datetime \| None | set to the `now` passed to accept/reject/cancel |
+
+**Not persistable yet:** `collab_type` and `desired_timing` are kept in the domain and in the contract because the UI needs them (assumption), but the database table `collab_requests` has no such columns, so they cannot be persisted until proposal P4 in `docs/db-change-proposals.md` is applied.
 
 The domain never reads the clock; callers pass a timezone-aware `now`.
 
