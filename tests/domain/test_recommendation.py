@@ -17,18 +17,18 @@ R = ReasonCode
 SAMPLE = Path(__file__).parents[2] / "data" / "samples" / "businesses.sample.json"
 
 
-def biz(id, industry="b", customers=(), quiet=(), mood=()):
+def biz(id, category="b", customers=(), quiet=(), mood=()):
     return Business(
         id=id,
-        name=f"shop{id}",
-        industry=industry,
-        main_customers=frozenset(customers),
-        quiet_hours=frozenset(quiet),
+        business_name=f"shop{id}",
+        category=category,
+        target_customers=frozenset(customers),
+        slow_times=frozenset(quiet),
         mood_tags=frozenset(mood),
     )
 
 
-TARGET = biz(1, industry="a", customers="xy", quiet=["q1"], mood=["m1"])
+TARGET = biz(1, category="a", customers="xy", quiet=["q1"], mood=["m1"])
 
 FULL = biz(2, customers="xy", quiet=["q1"], mood=["m1"])  # 0.35 + 0.25 + 0.25
 HALF_CUSTOMERS_3 = biz(3, "c", customers="x")  # 0.35 * 0.5
@@ -119,10 +119,10 @@ def _load_sample():
     return [
         Business(
             id=s["id"],
-            name=s["name"],
-            industry=s["industry"],
-            main_customers=frozenset(s["main_customers"]),
-            quiet_hours=frozenset(s["quiet_hours"]),
+            business_name=s["business_name"],
+            category=s["category"],
+            target_customers=frozenset(s["target_customers"]),
+            slow_times=frozenset(s["slow_times"]),
             mood_tags=frozenset(s["mood_tags"]),
         )
         for s in shops
@@ -132,13 +132,13 @@ def _load_sample():
 def test_sample_dataset_all_targets():
     shops = _load_sample()
     assert len(shops) == 22
-    industry = {s.id: s.industry for s in shops}
+    category = {s.id: s.category for s in shops}
     for target in shops:
         recs = recommend(target, shops)
         assert len(recs) <= 5
         ids = [r.business_id for r in recs]
         assert target.id not in ids
-        assert all(industry[i] != target.industry for i in ids)
+        assert all(category[i] != target.category for i in ids)
         assert recs == sorted(recs, key=lambda r: (-r.score, r.business_id))
         assert all(r.reasons for r in recs)
         assert recs == recommend(target, shops)

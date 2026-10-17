@@ -1,7 +1,10 @@
 import json
+import re
 from pathlib import Path
 
 import jsonschema
+
+from app.domain.catalog import MOOD_TAGS, SLOW_TIMES, TARGET_CUSTOMERS, unknown_values
 
 DIR = Path(__file__).resolve().parent.parent / "data" / "samples"
 DATA = json.loads((DIR / "businesses.sample.json").read_text(encoding="utf-8"))
@@ -16,8 +19,8 @@ def test_validates_against_schema():
 def test_schema_enums_match_meta_options():
     props = SCHEMA["properties"]["businesses"]["items"]["properties"]
     opts = DATA["meta"]["provisional_options"]
-    assert props["industry"]["enum"] == opts["industry"]
-    for key in ("main_customers", "quiet_hours", "mood_tags"):
+    assert props["category"]["enum"] == opts["category"]
+    for key in ("target_customers", "slow_times", "mood_tags"):
         assert props[key]["items"]["enum"] == opts[key]
 
 
@@ -38,12 +41,28 @@ def test_ids_are_positive_integers():
 
 
 def test_neighborhoods():
-    ids = {n["id"] for n in DATA["neighborhoods"]}
-    assert len(ids) >= 2
-    assert all(b["neighborhood_id"] in ids for b in BUSINESSES)
-    for nid in ids:
-        assert sum(b["neighborhood_id"] == nid for b in BUSINESSES) >= 8
+    districts = {b["district"] for b in BUSINESSES}
+    assert len(districts) >= 2
+    for district in districts:
+        assert sum(b["district"] == district for b in BUSINESSES) >= 8
 
 
 def test_at_least_5_industries():
-    assert len({b["industry"] for b in BUSINESSES}) >= 5
+    assert len({b["category"] for b in BUSINESSES}) >= 5
+
+
+def test_array_values_are_in_catalog():
+    for key, allowed in (
+        ("target_customers", TARGET_CUSTOMERS),
+        ("slow_times", SLOW_TIMES),
+        ("mood_tags", MOOD_TAGS),
+    ):
+        for b in BUSINESSES:
+            assert unknown_values(allowed, b[key]) == [], (b["id"], key)
+
+
+def test_category_and_district_fit_database_columns():
+    for b in BUSINESSES:
+        assert re.fullmatch(r"[a-z][a-z0-9_]*", b["category"])
+        assert len(b["category"]) <= 50
+        assert len(b["district"]) <= 50

@@ -44,7 +44,7 @@ Removed from the backend contract (2026-10-08)
 POST /v1/businesses registers a business. The server does it because the database blocks client inserts into business_profiles and client writes to the verification fields (trigger nook_business_verification_guard, see docs/database.md).
 
 Flow:
-1. The app sends business_number, business_name, opening_date and industry (the app completes the rest of the profile afterwards directly in Supabase).
+1. The app sends business_number, business_name, opening_date and category (the app completes the rest of the profile afterwards directly in Supabase).
 2. The server calls the database function nook_consume_verification_attempt, which enforces the limit of 5 attempts per 10 minutes per user. Over the limit: 429 RATE_LIMITED.
 3. The server looks the number up with the tax authority, inserts the row and returns 201 with id and verification_status.
 
@@ -72,3 +72,16 @@ One account can own several businesses, so the client says which business it act
 Path renames (business-scoped, one account can own several businesses): POST /v1/me/business/verification is now POST /v1/businesses/{business_id}/verification; POST /v1/me/business/intro-draft is now POST /v1/businesses/{business_id}/intro-draft.
 
 Verified database facts: see docs/database.md.
+
+## Field renames (2026-10-16)
+
+Business fields now use the `business_profiles` column names. These are provisional defaults for the frontend to review; see docs/catalog.md for the option values.
+
+| Old name | New name |
+|---|---|
+| industry | category |
+| neighborhood_id | district (string, the neighborhood display name, nullable, max 50) |
+| main_customers | target_customers |
+| quiet_hours | slow_times |
+| name (business) | business_name |
+| intro (business) | ai_intro |

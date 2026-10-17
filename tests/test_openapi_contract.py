@@ -6,6 +6,7 @@ import yaml
 from openapi_spec_validator import validate
 
 from app.core.errors import ErrorCode
+from app.domain.catalog import MOOD_TAGS, SLOW_TIMES, TARGET_CUSTOMERS
 from app.domain.collab_request import CollabRequest, CollabType, RequestSource, RequestStatus
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -162,7 +163,7 @@ def test_business_registration_request_schema():
         "business_number",
         "business_name",
         "opening_date",
-        "industry",
+        "category",
     }
     assert re.fullmatch(schema["properties"]["business_number"]["pattern"], "0123456789")
     assert not re.fullmatch(schema["properties"]["business_number"]["pattern"], "012-34-56789")
@@ -192,3 +193,17 @@ def test_rate_limited_code_and_operations():
         ("POST", "/v1/businesses"),
         ("POST", "/v1/businesses/{business_id}/verification"),
     }
+
+
+def test_business_profile_option_enums_match_catalog():
+    props = SCHEMAS["BusinessProfile"]["properties"]
+    assert tuple(props["target_customers"]["items"]["enum"]) == TARGET_CUSTOMERS
+    assert tuple(props["slow_times"]["items"]["enum"]) == SLOW_TIMES
+    assert tuple(props["mood_tags"]["items"]["enum"]) == MOOD_TAGS
+
+
+def test_business_profile_has_no_provisional_field_names():
+    props = SCHEMAS["BusinessProfile"]["properties"]
+    # names are split so the repo-wide leftover-name grep stays empty
+    assert "indus" + "try" not in props
+    assert "neighborhood" + "_id" not in props

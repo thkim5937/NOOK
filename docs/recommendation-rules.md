@@ -6,16 +6,16 @@ endpoint yet and it does not change the API contract.
 ## Hard rules (never overridden)
 
 1. The target shop itself is never recommended.
-2. A candidate in the **same industry** as the target is never recommended (legal rule:
+2. A candidate in the **same category** as the target is never recommended (legal rule:
    same-industry matching is avoided for fair-trade law reasons).
 3. Candidates whose id is in `exclude_ids` are skipped.
 
 ## Scoring
 
 ```
-base  = 0.35 * jaccard(main_customers)
+base  = 0.35 * jaccard(target_customers)
       + 0.25 * jaccard(mood_tags)
-      + 0.25 * jaccard(quiet_hours)
+      + 0.25 * jaccard(slow_times)
 score = base + 0.15   if candidate id is in open_post_ids, else base
 ```
 
@@ -31,9 +31,9 @@ Reasons are listed in this fixed order. Every returned recommendation has at lea
 
 | Code | Added when | UI wording |
 |------|------------|------------|
-| `customer_overlap` | `main_customers` intersect | Customers overlap |
+| `customer_overlap` | `target_customers` intersect | Customers overlap |
 | `mood_similar` | `mood_tags` intersect | Mood is similar |
-| `quiet_hours_overlap` | `quiet_hours` intersect | Quiet hours overlap |
+| `quiet_hours_overlap` | `slow_times` intersect | Quiet hours overlap |
 | `open_to_collab` | candidate id is in `open_post_ids` | Currently recruiting collaborators |
 
 "Different industry" was deliberately removed as a reason: the hard rule makes it true for
@@ -42,7 +42,7 @@ every result, so it carries no information.
 ## Provisional and assumed
 
 Provisional (product decisions, may change):
-- Option values (industry, customers, quiet hours, mood). The code only compares sets and never
+- Option values (category, target customers, slow times, mood). The code only compares sets and never
   depends on specific values; the catalog is fixed later by the data teammate.
 - The weights 0.35 / 0.25 / 0.25 and the 0.15 bonus.
 - Using quiet hours rather than opening hours (`_quiet_hours_overlap` is isolated to be swapped).

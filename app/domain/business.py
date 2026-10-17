@@ -3,12 +3,13 @@
 from dataclasses import dataclass
 
 
-# PROVISIONAL: option values are plain strings until the data teammate fixes the DB catalog.
+# Field names follow the business_profiles columns. Option values: app/domain/catalog.py
+# (not validated here; the database does not enforce them).
 @dataclass(frozen=True)
 class Business:
     id: int
-    name: str
-    industry: str
-    main_customers: frozenset[str]
-    quiet_hours: frozenset[str]
+    business_name: str
+    category: str
+    target_customers: frozenset[str]
+    slow_times: frozenset[str]
     mood_tags: frozenset[str]
