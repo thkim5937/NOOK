@@ -65,7 +65,42 @@ Implemented in `app/domain/collab_request_service.py` against ports (`BusinessOw
 3. `cancel`: only an owner of the sender business, from `pending` only. `responded_at` stays empty (assumption; the pure `cancel()` function still sets it, the service clears it).
 4. The permission check runs before the state check (assumption), after the request is found. A `Forbidden` message is generic and never reveals request state.
 
-Error mapping: there is no domain-error-to-HTTP mapping in the code yet (`app/core/errors.py` only handles `AppError`), so none was added. Intended mapping for the future HTTP layer: `Forbidden` to `AUTH_FORBIDDEN` (403), `DuplicatePendingRequest` and `InvalidStateTransition` to `REQUEST_INVALID_STATE` (409), `InvalidRequest` to `REQUEST_VALIDATION_FAILED` (422), `NotFoundInRepository` to `NOT_FOUND` (404).
+Pure `cancel()` still sets `responded_at`; the service clears it afterwards (known inconsistency, not fixed here).
+
+## Routes
+Implemented in `app/api/collab_requests.py`. All require `Authorization: Bearer ...` (`current_owner`; failure is 401 `AUTH_REQUIRED`) and answer with `{"data": CollabRequest}`.
+
+| Method and path | Service call | Success |
+|---|---|---|
+| `POST /v1/collab-requests` | `create` | 201 |
+| `POST /v1/collab-requests/{id}/accept` | `accept` | 200 |
+| `POST /v1/collab-requests/{id}/reject` | `reject` | 200 |
+| `POST /v1/collab-requests/{id}/cancel` | `cancel` | 200 |
+
+The create body is strict: integer ids (no strings), `source` / `collab_type` enums, unknown fields rejected (422). `{id}` must be an integer >= 1.
+
+### Error mapping
+One place: `app/api/domain_errors.py`. Messages are generic (no token, owner id or other users' data). Anything unmapped stays 500 `INTERNAL_ERROR`.
+
+| Domain error | Code | HTTP |
+|---|---|---|
+| `Forbidden` | `AUTH_FORBIDDEN` | 403 |
+| `DuplicatePendingRequest` | `REQUEST_INVALID_STATE` | 409 |
+| `InvalidStateTransition` | `REQUEST_INVALID_STATE` | 409 |
+| `InvalidRequest` | `REQUEST_VALIDATION_FAILED` | 422 |
+| `NotFoundInRepository` | `NOT_FOUND` | 404 |
+
+### Assumptions
+- Unknown id gives 404 before the ownership check (403). Assumption: request ids are sequential integers and their existence is not secret.
+- Default wiring denies every write: the repository is one process-wide in-memory instance, and ownership is `NotConfiguredBusinessOwnership` (`owns()` is always false), so real routes answer 403 until a database ownership adapter exists. The mock server stays the frontend's target. Repository, ownership and clock are replaceable through FastAPI dependency overrides (`get_collab_repository`, `get_business_ownership`, `get_clock`).
+- Ids come from one process-wide counter (the service is built per request).
+
+### Contract mismatches (contract not edited)
+- `POST /v1/collab-requests` can answer 409 (duplicate pending); the contract does not document 409. It documents 404, which this route can never produce.
+- `accept` and `reject` can answer 403 and 422 (path id < 1); the contract documents neither.
+- `cancel` / `accept` / `reject` with id < 1 answer 422; only `create` documents 422.
+- The create schema does not say `additionalProperties: false`; the implementation rejects unknown fields anyway.
+- The `cancel` example shows a non-null `responded_at`; the service returns null (the schema allows it).
 
 Limits: the duplicate check is not atomic (two concurrent creates can both pass it), and the database has no uniqueness on business pairs. Proposal P5 in `docs/db-change-proposals.md` would close this.
 
